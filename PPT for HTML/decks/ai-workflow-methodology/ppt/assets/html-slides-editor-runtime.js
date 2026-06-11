@@ -182,7 +182,7 @@
         top: calc(100% + 8px);
         left: 50%;
         transform: translateX(-50%) translateY(-2px);
-        width: min(420px, calc(100vw - 32px));
+        width: max-content;
         max-width: calc(100vw - 32px);
         padding: 8px 11px;
         border-radius: 10px;
