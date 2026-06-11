@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTML Slides Editor</title>
+  <meta name="description" content="A Codex skill for directly editing AI-generated HTML slide decks in the browser preview, with drag and drop image replacement and auto-save.">
+  <style>
+    :root {
+      --ink: #151515;
+      --muted: #5e625f;
+      --paper: #f7f4ed;
+      --line: rgba(21, 21, 21, 0.14);
+      --green: #10b777;
+      --blue: #1782f3;
+      --violet: #7048df;
+      --white: #ffffff;
+      --shadow: 0 24px 80px rgba(12, 20, 18, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hero {
+      min-height: 92vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      color: var(--white);
+      background:
+        linear-gradient(180deg, rgba(4, 9, 8, 0.34), rgba(4, 9, 8, 0.68)),
+        url("./assets/editor-preview-lake.jpg") center / cover no-repeat;
+    }
+
+    .topbar {
+      width: 100%;
+      height: 64px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: start;
+      gap: 24px;
+      padding: 22px 28px 0;
+      background:
+        linear-gradient(90deg, rgba(16, 183, 119, 0.9), rgba(23, 130, 243, 0.9), rgba(112, 72, 223, 0.9)),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0));
+    }
+
+    .brand {
+      font-weight: 760;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      height: 34px;
+      padding: 0 18px;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 999px;
+      color: var(--white);
+      font-weight: 720;
+      line-height: 1;
+      background: transparent;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--white);
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.52);
+      animation: breathe 1.5s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        opacity: 0.72;
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+      }
+      50% {
+        opacity: 1;
+        box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+      }
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 30px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .hero-copy {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 9vh 0 10vh;
+    }
+
+    .eyebrow {
+      max-width: 780px;
+      margin: 0 0 22px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+      font-weight: 760;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 920px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 112px;
+      line-height: 0.92;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      max-width: 720px;
+      margin: 28px 0 0;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 23px;
+      line-height: 1.38;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 18px;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 8px;
+      color: var(--white);
+      font-weight: 760;
+      background: rgba(255, 255, 255, 0.09);
+      backdrop-filter: blur(10px);
+    }
+
+    .button.secondary {
+      background: transparent;
+    }
+
+    .section {
+      padding: 72px 24px;
+    }
+
+    .section.compact {
+      padding-top: 42px;
+    }
+
+    .wrap {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    .section-title {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1fr);
+      gap: 40px;
+      align-items: end;
+      margin-bottom: 36px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 56px;
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .section-title p,
+    .body-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.58;
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .step,
+    .feature,
+    .command,
+    .store-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .step {
+      padding: 22px;
+      min-height: 178px;
+    }
+
+    .num {
+      display: block;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .step strong,
+    .feature strong,
+    .store-item strong {
+      display: block;
+      margin-top: 18px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .step p,
+    .feature p,
+    .store-item p {
+      margin: 12px 0 0;
+      color: var(--muted);
+    }
+
+    .preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .preview figure {
+      margin: 0;
+      min-height: 300px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      background: #ddd;
+    }
+
+    .preview img {
+      width: 100%;
+      height: 100%;
+      min-height: 300px;
+      display: block;
+      object-fit: cover;
+    }
+
+    .drop-label {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--white);
+      font-weight: 800;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.32);
+    }
+
+    .crop-icon {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: 42px;
+      height: 42px;
+      color: var(--white);
+      filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.42));
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .feature {
+      padding: 20px;
+      min-height: 190px;
+    }
+
+    .feature span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      color: var(--white);
+      font-weight: 860;
+      background: linear-gradient(135deg, var(--green), var(--blue), var(--violet));
+    }
+
+    .install {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .command {
+      padding: 22px;
+      overflow: hidden;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      color: #f4f7f4;
+      background: #171a18;
+      border-radius: 8px;
+      padding: 18px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    .store-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .store-item {
+      padding: 22px;
+    }
+
+    .footer {
+      padding: 34px 24px 44px;
+      color: rgba(21, 21, 21, 0.58);
+      border-top: 1px solid var(--line);
+    }
+
+    .footer .wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    @media (max-width: 880px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 12px;
+        padding: 18px 20px;
+      }
+
+      .status-pill {
+        width: max-content;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .section-title,
+      .install {
+        grid-template-columns: 1fr;
+      }
+
+      .workflow,
+      .preview,
+      .features,
+      .store-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy {
+        width: min(100% - 36px, 1120px);
+        padding-bottom: 7vh;
+      }
+
+      h1 {
+        font-size: 72px;
+      }
+
+      h2 {
+        font-size: 42px;
+      }
+
+      .lede {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      h1 {
+        font-size: 52px;
+      }
+
+      h2 {
+        font-size: 34px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="topbar" aria-label="Editor preview">
+      <a class="brand" href="https://github.com/imvanessali/HTML-Slides-Editor">HTML Slides Editor</a>
+      <span class="status-pill"><span class="dot" aria-hidden="true"></span>Editing</span>
+      <nav class="actions" aria-label="Editor actions">
+        <span>Undo</span>
+        <span>Redo</span>
+      </nav>
+    </div>
+    <div class="hero-copy">
+      <p class="eyebrow">Codex skill for AI-generated HTML slide decks</p>
+      <h1>HTML Slides Editor</h1>
+      <p class="lede">Turn a generated HTML presentation into a direct editing surface: change text in the preview, drag images onto existing visuals, crop in place, and save the result back to the deck.</p>
+      <div class="hero-links">
+        <a class="button" href="#install">Install the skill</a>
+        <a class="button secondary" href="https://github.com/imvanessali/HTML-Slides-Editor">View on GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section compact">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Built for the last mile of slide making.</h2>
+          <p>AI agents can draft the deck. Humans still need fast, tactile control over final wording, image swaps, and visual framing. This skill keeps that loop inside the HTML preview.</p>
+        </div>
+        <div class="workflow">
+          <div class="step">
+            <span class="num">Step 01</span>
+            <strong>Generate HTML slides</strong>
+            <p>Use your agent to create a normal HTML presentation with DOM text and image assets.</p>
+          </div>
+          <div class="step">
+            <span class="num">Step 02</span>
+            <strong>Enable editing</strong>
+            <p>The skill injects a compact editor bar, runtime, auto-save snippet, and local save server.</p>
+          </div>
+          <div class="step">
+            <span class="num">Step 03</span>
+            <strong>Edit in the preview</strong>
+            <p>Type directly on rendered text, drop images onto existing visuals, crop them, and reload safely.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Text editing and image replacement, visibly.</h2>
+          <p>The runtime is intentionally small: a top editor bar, a clear image drop state, and crop controls that stay inside the original image frame.</p>
+        </div>
+        <div class="preview" aria-label="Editor visual preview">
+          <figure>
+            <img src="./assets/editor-preview-lake.jpg" alt="Mountain lake slide image">
+            <figcaption class="drop-label">Edit text freely</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/editor-preview-town.jpg" alt="Old town slide image">
+            <figcaption class="drop-label">Drop your new image here</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/editor-preview-desert.jpg" alt="Desert slide image">
+            <svg class="crop-icon" viewBox="0 0 1024 1024" aria-label="Crop handle preview">
+              <path d="M793.002667 853.333333l-97.834667-97.834666a42.666667 42.666667 0 0 1 60.330667-60.330667L853.333333 793.002667V725.333333a42.666667 42.666667 0 0 1 85.333334 0v213.333334h-213.333334a42.666667 42.666667 0 0 1 0-85.333334h67.669334z m0-682.666666H725.333333a42.666667 42.666667 0 0 1 0-85.333334h213.333334v213.333334a42.666667 42.666667 0 0 1-85.333334 0V230.997333l-97.834666 97.834667a42.666667 42.666667 0 0 1-60.330667-60.330667L793.002667 170.666667zM170.666667 230.997333V298.666667a42.666667 42.666667 0 1 1-85.333334 0V85.333333h213.333334a42.666667 42.666667 0 1 1 0 85.333334H230.997333l97.834667 97.834666a42.666667 42.666667 0 0 1-60.330667 60.330667L170.666667 230.997333zM230.997333 853.333333H298.666667a42.666667 42.666667 0 0 1 0 85.333334H85.333333v-213.333334a42.666667 42.666667 0 0 1 85.333334 0v67.669334l97.834666-97.834667a42.666667 42.666667 0 1 1 60.330667 60.330667L230.997333 853.333333z" fill="currentColor"></path>
+            </svg>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>What the skill packages.</h2>
+          <p>A store-ready skill needs more than a script. This repository includes the instructions, runtime assets, switch tool, metadata, examples, and MIT license.</p>
+        </div>
+        <div class="features">
+          <div class="feature">
+            <span>1</span>
+            <strong>Skill entry point</strong>
+            <p><code>.codex/skills/html-slides-editor/SKILL.md</code> defines when and how Codex should use it.</p>
+          </div>
+          <div class="feature">
+            <span>2</span>
+            <strong>Bundled runtime</strong>
+            <p>The JavaScript editor, autosave snippet, and local save server live under <code>assets/</code>.</p>
+          </div>
+          <div class="feature">
+            <span>3</span>
+            <strong>Idempotent switch</strong>
+            <p>The Python switch script can enable or disable the editor repeatedly without duplicate injection.</p>
+          </div>
+          <div class="feature">
+            <span>4</span>
+            <strong>Store metadata</strong>
+            <p><code>agents/openai.yaml</code> provides a display name, short description, and default prompt.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="install" class="section">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Install and run.</h2>
+          <p>Use the repository as a skill source. Persistent edits require the local save server, because direct <code>file://</code> previews cannot write back to disk.</p>
+        </div>
+        <div class="install">
+          <div class="command">
+            <pre><code>python3 .codex/skills/html-slides-editor/scripts/slides_editor_switch.py enable --autosave path/to/index.html
+node path/to/html-slides-editor-server.js 8765</code></pre>
+          </div>
+          <div class="command">
+            <pre><code>Skill name: html-slides-editor
+Repository: imvanessali/HTML-Slides-Editor
+License: MIT
+Entry: .codex/skills/html-slides-editor/SKILL.md</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Ready for skill stores.</h2>
+          <p>Different stores use different submission flows. The same repo can support them when the public page clearly explains scope, install path, permissions, and examples.</p>
+        </div>
+        <div class="store-grid">
+          <div class="store-item">
+            <strong>Clear scope</strong>
+            <p>This is an embedded editor for HTML slide decks, not a Chrome extension and not an HTML checker.</p>
+          </div>
+          <div class="store-item">
+            <strong>Predictable permissions</strong>
+            <p>It edits local HTML files only through the generated local save server.</p>
+          </div>
+          <div class="store-item">
+            <strong>Portable package</strong>
+            <p>Instructions, scripts, runtime assets, examples, and metadata are all kept in the repository.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>HTML Slides Editor</span>
+      <span>MIT License</span>
+    </div>
+  </footer>
+</body>
+</html>
