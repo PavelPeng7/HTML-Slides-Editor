@@ -30,6 +30,6 @@ Multi-file HTML:
 </body>
 ```
 
-## Durable Export Caveat
+## Durable Image Replacement
 
-Object URLs created by `URL.createObjectURL(file)` do not survive reloads. If persistent export is required, adjust the image replacement path to read the file as a Data URL and set `src` / `backgroundImage` to that Data URL.
+Read dropped image files as Data URLs and set `src`, SVG image `href`, or `backgroundImage` to that value. Do not use `URL.createObjectURL(file)` for replacement images, because `blob:` URLs expire on reload and cannot be saved durably into `index.html`.

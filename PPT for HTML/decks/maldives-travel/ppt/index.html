@@ -64,218 +64,8 @@
     .hero-content{max-width:92vw}
   }
 </style>
-<style id="__html_presentation_editor_styles">
-      @keyframes __hpe_breathe {
-        0%, 100% {
-          opacity: 1;
-          transform: scale(1);
-          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.42);
-        }
-        50% {
-          opacity: .62;
-          transform: scale(.78);
-          box-shadow: 0 0 0 5px rgba(255, 255, 255, 0);
-        }
-      }
-      #__html_presentation_editor_bar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 2147483647;
-        height: 56px;
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-        align-items: center;
-        column-gap: 14px;
-        padding: 0 16px;
-        background: transparent;
-        color: #fff;
-        border-bottom: 0;
-        box-shadow: none;
-        font: 500 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        letter-spacing: 0;
-        user-select: none;
-      }
-      #__html_presentation_editor_bar::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        background: linear-gradient(90deg,
-          #00c853 0%,
-          #00bcd4 30%,
-          #2979ff 62%,
-          #7c4dff 100%
-        );
-        -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0) 100%);
-        mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0) 100%);
-      }
-      #__html_presentation_editor_bar * { box-sizing: border-box; }
-      #__html_presentation_editor_bar > * {
-        position: relative;
-        z-index: 1;
-        transform: translateY(-3px);
-      }
-      #__html_presentation_editor_bar .__hpe_title {
-        font-weight: 700;
-        justify-self: start;
-      }
-      #__html_presentation_editor_bar .__hpe_toggle {
-        margin-left: 0;
-        justify-self: center;
-        position: relative;
-        min-width: 82px;
-        height: 28px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.72);
-        background: transparent;
-        color: #fff;
-        font-weight: 650;
-      }
-      #__html_presentation_editor_bar .__hpe_toggle:hover {
-        background: transparent;
-        opacity: 1;
-      }
-      #__html_presentation_editor_bar .__hpe_toggle::after {
-        content: attr(data-hpe-tip);
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 50%;
-        transform: translateX(-50%) translateY(-2px);
-        width: max-content;
-        max-width: calc(100vw - 32px);
-        padding: 8px 11px;
-        border-radius: 10px;
-        background: rgba(20, 20, 24, 0.84);
-        color: #fff;
-        font-size: 12px;
-        line-height: 1.35;
-        font-weight: 500;
-        white-space: normal;
-        overflow-wrap: break-word;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity .16s ease, transform .16s ease;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-      }
-      #__html_presentation_editor_bar .__hpe_toggle:hover::after,
-      #__html_presentation_editor_bar .__hpe_toggle:focus-visible::after {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-      #__html_presentation_editor_bar .__hpe_state_dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        border: 1px solid currentColor;
-        flex: 0 0 auto;
-      }
-      #__html_presentation_editor_bar .__hpe_toggle.__hpe_active .__hpe_state_dot {
-        border-color: transparent;
-        background: currentColor;
-        animation: __hpe_breathe 1.6s ease-in-out infinite;
-      }
-      body.low-power #__html_presentation_editor_bar .__hpe_toggle.__hpe_active .__hpe_state_dot {
-        animation: __hpe_breathe 1.6s ease-in-out infinite !important;
-      }
-      #__html_presentation_editor_bar .__hpe_toggle.__hpe_paused .__hpe_state_dot {
-        background: transparent;
-        animation: none;
-      }
-      #__html_presentation_editor_bar .__hpe_actions {
-        justify-self: end;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      #__html_presentation_editor_bar button {
-        height: 30px;
-        border: 0;
-        border-radius: 8px;
-        padding: 0 11px;
-        color: #fff;
-        background: transparent;
-        font: inherit;
-        cursor: pointer;
-      }
-      #__html_presentation_editor_bar button:hover {
-        background: transparent;
-        opacity: .78;
-      }
-      [data-hpe-highlight="true"] {
-        outline: 0 !important;
-        box-shadow: none !important;
-      }
-      #__html_presentation_editor_drop_overlay {
-        position: fixed;
-        z-index: 2147483646;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-        border: 0;
-        background: rgba(0, 0, 0, 0.32);
-        color: #fff;
-        font: 700 14px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        letter-spacing: .01em;
-        text-align: center;
-        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
-        will-change: left, top, width, height;
-      }
-      .frame-img.__hpe_crop_active {
-        overflow: hidden !important;
-      }
-      .frame-img.__hpe_crop_active img[data-hpe-crop="true"] {
-        cursor: grab;
-        touch-action: none;
-        user-select: none;
-        will-change: transform, object-position;
-      }
-      body.__hpe_crop_dragging .frame-img.__hpe_crop_active img[data-hpe-crop="true"] {
-        cursor: grabbing;
-      }
-      .__hpe_crop_handle {
-        position: absolute;
-        right: 8px;
-        bottom: 8px;
-        z-index: 2147483645;
-        width: 26px;
-        height: 26px;
-        display: grid;
-        place-items: center;
-        border: 0;
-        border-radius: 0;
-        background: transparent;
-        box-shadow: none;
-        color: #fff;
-        cursor: nwse-resize;
-        pointer-events: auto;
-      }
-      .__hpe_crop_handle svg {
-        width: 22px;
-        height: 22px;
-        display: block;
-        filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.72));
-        pointer-events: none;
-      }
-    </style></head>
-<body class="__hpe_editing"><div id="__html_presentation_editor_bar" contenteditable="false">
-        <div class="__hpe_title">HTML Slides Editor</div>
-        <button type="button" class="__hpe_toggle __hpe_active" data-hpe-action="toggle" data-hpe-tip="Edit text freely. Drag and drop to replace an image.">
-          <span class="__hpe_state_dot" aria-hidden="true" style="opacity: 0.655; transform: scale(0.819); box-shadow: rgba(255, 255, 255, 0.15) 0px 0px 0px 2px;"></span>
-          <span data-hpe-toggle-label="">Editing</span>
-        </button>
-        <div class="__hpe_actions">
-          <button type="button" data-hpe-action="undo">Undo</button>
-          <button type="button" data-hpe-action="redo">Redo</button>
-        </div>
-      </div>
+</head>
+<body>
 <main id="deck">
   <section class="slide hero">
     <img class="hero-img" src="https://images.unsplash.com/photo-1573843981267-be1999ff37cd?auto=format&amp;fit=crop&amp;w=2400&amp;q=86" alt="Overwater villas and turquoise lagoon in the Maldives">
@@ -371,11 +161,12 @@
     if (event.key === "ArrowLeft" || event.key === "PageUp") go(current - 1);
   });
 </script>
-<script src="./assets/html-slides-editor-runtime.js?v=20260611-drag-overlay"></script>
+<script src="./assets/html-slides-editor-runtime.js?v=20260611-persistent-save"></script>
+<!-- HTML Slides Editor autosave start -->
 <script>
 (function () {
   var saveTimer = null;
-  var DELAY = 1800; // ms after last change before saving
+  var DELAY = 1800;
 
   function showSaved() {
     var bar = document.getElementById("__html_presentation_editor_bar");
@@ -386,21 +177,54 @@
     el.className = "__autosave_label";
     el.textContent = "Saved";
     el.style.cssText = "font:500 12px/1 inherit;letter-spacing:.06em;opacity:0;transition:opacity .25s;color:rgba(255,255,255,.72);margin-left:10px;";
-    bar.querySelector(".__hpe_actions") && bar.querySelector(".__hpe_actions").appendChild(el);
-    requestAnimationFrame(function(){ el.style.opacity = "1"; });
-    setTimeout(function(){ el.style.opacity = "0"; setTimeout(function(){ el.remove(); }, 300); }, 2000);
+    var actions = bar.querySelector(".__hpe_actions");
+    if (actions) actions.appendChild(el);
+    requestAnimationFrame(function () { el.style.opacity = "1"; });
+    setTimeout(function () {
+      el.style.opacity = "0";
+      setTimeout(function () { el.remove(); }, 300);
+    }, 2000);
+  }
+
+  function removeAll(root, selector) {
+    Array.prototype.forEach.call(root.querySelectorAll(selector), function (el) {
+      el.remove();
+    });
+  }
+
+  function getCleanHtml() {
+    var root = document.documentElement.cloneNode(true);
+    removeAll(root, "#__html_presentation_editor_bar");
+    removeAll(root, "#__html_presentation_editor_styles");
+    removeAll(root, "#__html_presentation_editor_drop_overlay");
+    removeAll(root, ".__hpe_crop_handle");
+    removeAll(root, ".__autosave_label");
+    Array.prototype.forEach.call(root.querySelectorAll("[data-hpe-highlight]"), function (el) {
+      el.removeAttribute("data-hpe-highlight");
+    });
+    Array.prototype.forEach.call(root.querySelectorAll(".__hpe_crop_active"), function (el) {
+      el.classList.remove("__hpe_crop_active");
+    });
+    var body = root.querySelector("body");
+    if (body) {
+      body.classList.remove("__hpe_editing", "__hpe_file_dragging", "__hpe_crop_dragging");
+      if (!body.getAttribute("class")) body.removeAttribute("class");
+    }
+    return "<!DOCTYPE html>\n" + root.outerHTML;
   }
 
   function doSave() {
-    // Strip the autosave label before saving
-    var label = document.querySelector(".__autosave_label");
-    if (label) label.remove();
-    var html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
     fetch("/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ html: html })
-    }).then(function(r){ return r.json(); }).then(function(d){ if (d.ok) showSaved(); });
+      body: JSON.stringify({ html: getCleanHtml() })
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      if (data.ok) showSaved();
+    }).catch(function () {
+      // A static server has no /save endpoint. Keep editing live even if persistence is unavailable.
+    });
   }
 
   function scheduleSave() {
@@ -408,9 +232,7 @@
     saveTimer = setTimeout(doSave, DELAY);
   }
 
-  // Watch for DOM mutations (text edits, image replacements, etc.)
-  var observer = new MutationObserver(function(mutations) {
-    // Ignore changes inside the editor bar itself
+  var observer = new MutationObserver(function (mutations) {
     for (var i = 0; i < mutations.length; i++) {
       var target = mutations[i].target;
       if (target.closest && target.closest("#__html_presentation_editor_bar")) continue;
@@ -419,14 +241,21 @@
     }
   });
 
-  // Start observing once the editor bar is ready
   function startObserver() {
     observer.observe(document.body, {
-      childList: true, subtree: true,
-      characterData: true, attributes: true,
-      attributeFilter: ["src", "data-hpe-crop-scale", "data-hpe-crop-position-x",
-                        "data-hpe-crop-position-y", "data-hpe-crop-translate-x",
-                        "data-hpe-crop-translate-y"]
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: [
+        "src",
+        "href",
+        "data-hpe-crop-scale",
+        "data-hpe-crop-position-x",
+        "data-hpe-crop-position-y",
+        "data-hpe-crop-translate-x",
+        "data-hpe-crop-translate-y"
+      ]
     });
   }
 
@@ -437,6 +266,5 @@
   }
 })();
 </script>
-
-
+<!-- HTML Slides Editor autosave end -->
 </body></html>

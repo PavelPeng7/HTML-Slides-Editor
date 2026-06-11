@@ -1,0 +1,105 @@
+<!-- HTML Slides Editor autosave start -->
+<script>
+(function () {
+  var saveTimer = null;
+  var DELAY = 1800;
+
+  function showSaved() {
+    var bar = document.getElementById("__html_presentation_editor_bar");
+    if (!bar) return;
+    var existing = bar.querySelector(".__autosave_label");
+    if (existing) existing.remove();
+    var el = document.createElement("span");
+    el.className = "__autosave_label";
+    el.textContent = "Saved";
+    el.style.cssText = "font:500 12px/1 inherit;letter-spacing:.06em;opacity:0;transition:opacity .25s;color:rgba(255,255,255,.72);margin-left:10px;";
+    var actions = bar.querySelector(".__hpe_actions");
+    if (actions) actions.appendChild(el);
+    requestAnimationFrame(function () { el.style.opacity = "1"; });
+    setTimeout(function () {
+      el.style.opacity = "0";
+      setTimeout(function () { el.remove(); }, 300);
+    }, 2000);
+  }
+
+  function removeAll(root, selector) {
+    Array.prototype.forEach.call(root.querySelectorAll(selector), function (el) {
+      el.remove();
+    });
+  }
+
+  function getCleanHtml() {
+    var root = document.documentElement.cloneNode(true);
+    removeAll(root, "#__html_presentation_editor_bar");
+    removeAll(root, "#__html_presentation_editor_styles");
+    removeAll(root, "#__html_presentation_editor_drop_overlay");
+    removeAll(root, ".__hpe_crop_handle");
+    removeAll(root, ".__autosave_label");
+    Array.prototype.forEach.call(root.querySelectorAll("[data-hpe-highlight]"), function (el) {
+      el.removeAttribute("data-hpe-highlight");
+    });
+    Array.prototype.forEach.call(root.querySelectorAll(".__hpe_crop_active"), function (el) {
+      el.classList.remove("__hpe_crop_active");
+    });
+    var body = root.querySelector("body");
+    if (body) {
+      body.classList.remove("__hpe_editing", "__hpe_file_dragging", "__hpe_crop_dragging");
+      if (!body.getAttribute("class")) body.removeAttribute("class");
+    }
+    return "<!DOCTYPE html>\n" + root.outerHTML;
+  }
+
+  function doSave() {
+    fetch("/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ html: getCleanHtml() })
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      if (data.ok) showSaved();
+    }).catch(function () {
+      // A static server has no /save endpoint. Keep editing live even if persistence is unavailable.
+    });
+  }
+
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(doSave, DELAY);
+  }
+
+  var observer = new MutationObserver(function (mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      var target = mutations[i].target;
+      if (target.closest && target.closest("#__html_presentation_editor_bar")) continue;
+      scheduleSave();
+      return;
+    }
+  });
+
+  function startObserver() {
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: [
+        "src",
+        "href",
+        "data-hpe-crop-scale",
+        "data-hpe-crop-position-x",
+        "data-hpe-crop-position-y",
+        "data-hpe-crop-translate-x",
+        "data-hpe-crop-translate-y"
+      ]
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startObserver);
+  } else {
+    startObserver();
+  }
+})();
+</script>
+<!-- HTML Slides Editor autosave end -->

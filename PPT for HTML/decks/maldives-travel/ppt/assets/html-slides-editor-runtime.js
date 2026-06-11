@@ -650,7 +650,18 @@
 
   function replaceVisual(visual, file) {
     recordHistoryBoundary();
-    const url = URL.createObjectURL(file);
+    readFileAsDataURL(file, (url) => applyVisualURL(visual, url));
+  }
+
+  function readFileAsDataURL(file, onLoad) {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      if (typeof reader.result === "string") onLoad(reader.result);
+    }, { once: true });
+    reader.readAsDataURL(file);
+  }
+
+  function applyVisualURL(visual, url) {
     const { type, element } = visual;
 
     if (type === "svg-image") {
