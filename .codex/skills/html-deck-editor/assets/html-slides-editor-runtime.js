@@ -4,7 +4,7 @@
   const DROP_OVERLAY_ID = "__html_presentation_editor_drop_overlay";
   const CROP_HANDLE_CLASS = "__hpe_crop_handle";
   const CROP_ACTIVE_CLASS = "__hpe_crop_active";
-  const CROP_HANDLE_ICON = `<svg t="1781145929185" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5179" width="200" height="200"><path d="M793.002667 853.333333l-97.834667-97.834666a42.666667 42.666667 0 0 1 60.330667-60.330667L853.333333 793.002667V725.333333a42.666667 42.666667 0 0 1 85.333334 0v213.333334h-213.333334a42.666667 42.666667 0 0 1 0-85.333334h67.669334z m0-682.666666H725.333333a42.666667 42.666667 0 0 1 0-85.333334h213.333334v213.333334a42.666667 42.666667 0 0 1-85.333334 0V230.997333l-97.834666 97.834667a42.666667 42.666667 0 0 1-60.330667-60.330667L793.002667 170.666667zM170.666667 230.997333V298.666667a42.666667 42.666667 0 1 1-85.333334 0V85.333333h213.333334a42.666667 42.666667 0 1 1 0 85.333334H230.997333l97.834667 97.834666a42.666667 42.666667 0 0 1-60.330667 60.330667L170.666667 230.997333zM230.997333 853.333333H298.666667a42.666667 42.666667 0 0 1 0 85.333334H85.333333v-213.333334a42.666667 42.666667 0 0 1 85.333334 0v67.669334l97.834666-97.834667a42.666667 42.666667 0 1 1 60.330667 60.330667L230.997333 853.333333z" fill="#1C1C1C" p-id="5180"></path></svg>`;
+  const CROP_HANDLE_ICON = `<svg t="1781145929185" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5179" width="200" height="200"><path d="M793.002667 853.333333l-97.834667-97.834666a42.666667 42.666667 0 0 1 60.330667-60.330667L853.333333 793.002667V725.333333a42.666667 42.666667 0 0 1 85.333334 0v213.333334h-213.333334a42.666667 42.666667 0 0 1 0-85.333334h67.669334z m0-682.666666H725.333333a42.666667 42.666667 0 0 1 0-85.333334h213.333334v213.333334a42.666667 42.666667 0 0 1-85.333334 0V230.997333l-97.834666 97.834667a42.666667 42.666667 0 0 1-60.330667-60.330667L793.002667 170.666667zM170.666667 230.997333V298.666667a42.666667 42.666667 0 1 1-85.333334 0V85.333333h213.333334a42.666667 42.666667 0 1 1 0 85.333334H230.997333l97.834667 97.834666a42.666667 42.666667 0 0 1-60.330667 60.330667L170.666667 230.997333zM230.997333 853.333333H298.666667a42.666667 42.666667 0 0 1 0 85.333334H85.333333v-213.333334a42.666667 42.666667 0 0 1 85.333334 0v67.669334l97.834666-97.834667a42.666667 42.666667 0 1 1 60.330667 60.330667L230.997333 853.333333z" fill="currentColor" p-id="5180"></path></svg>`;
   const CLICK_BLOCK_EVENTS = ["click", "dblclick", "auxclick"];
   const POINTER_BLOCK_EVENTS = ["pointerdown", "mousedown", "touchstart", "pointerup", "mouseup", "touchend"];
   const GESTURE_BLOCK_EVENTS = ["wheel", "touchstart", "touchmove", "touchend"];
@@ -182,8 +182,8 @@
         top: calc(100% + 8px);
         left: 50%;
         transform: translateX(-50%) translateY(-2px);
-        width: max-content;
-        max-width: 320px;
+        width: min(420px, calc(100vw - 32px));
+        max-width: calc(100vw - 32px);
         padding: 8px 11px;
         border-radius: 10px;
         background: rgba(20, 20, 24, 0.84);
@@ -191,7 +191,8 @@
         font-size: 12px;
         line-height: 1.35;
         font-weight: 500;
-        white-space: nowrap;
+        white-space: normal;
+        overflow-wrap: break-word;
         pointer-events: none;
         opacity: 0;
         transition: opacity .16s ease, transform .16s ease;
@@ -283,16 +284,18 @@
         display: grid;
         place-items: center;
         border: 0;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.88);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        color: #fff;
         cursor: nwse-resize;
         pointer-events: auto;
       }
       .${CROP_HANDLE_CLASS} svg {
-        width: 15px;
-        height: 15px;
+        width: 22px;
+        height: 22px;
         display: block;
+        filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.72));
         pointer-events: none;
       }
     `;
