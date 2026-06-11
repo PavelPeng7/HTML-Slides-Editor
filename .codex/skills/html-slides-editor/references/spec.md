@@ -77,6 +77,7 @@ The skill must not be an HTML checker. It must not require a Chrome extension. I
 - Text editing should feel like editing a document.
 - Common slide navigation shortcuts and gestures are blocked while editing, so editing text does not accidentally switch slides.
 - Pausing editing restores normal deck interactions.
+- If the user clicks a blocked link, button, or scripted interactive element while editing is active, show a temporary hint telling them to pause editing to interact.
 
 **Acceptance:**
 
@@ -84,6 +85,7 @@ The skill must not be an HTML checker. It must not require a Chrome extension. I
 - Undo restores prior text.
 - Redo reapplies text.
 - Arrow/page/space navigation does not change slides while editing is active.
+- Clicking a blocked interactive element shows `Pause editing to interact with this element`.
 - Normal slide controls work again after editing is paused.
 
 ### 4. Image Replacement
@@ -193,6 +195,7 @@ The old visual's displayed area is the frame. The frame size must not change jus
 - drop overlay;
 - crop handles;
 - autosave status label;
+- pause-to-interact hint;
 - drag highlight attributes;
 - transient active/crop body classes.
 

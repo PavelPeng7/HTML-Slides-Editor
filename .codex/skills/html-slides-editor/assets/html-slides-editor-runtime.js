@@ -2,6 +2,7 @@
   const BAR_ID = "__html_presentation_editor_bar";
   const STYLE_ID = "__html_presentation_editor_styles";
   const DROP_OVERLAY_ID = "__html_presentation_editor_drop_overlay";
+  const INTERACTION_HINT_ID = "__html_presentation_editor_interaction_hint";
   const CROP_HANDLE_CLASS = "__hpe_crop_handle";
   const CROP_ACTIVE_CLASS = "__hpe_crop_active";
   const CROP_FRAME_CLASS = "__hpe_crop_frame";
@@ -43,6 +44,7 @@
     dotRAF: 0,
     highlightedElement: null,
     dragClearTimer: 0,
+    interactionHintTimer: 0,
     cropDrag: null,
     cropFrame: null,
     resizeTimer: 0
@@ -92,6 +94,7 @@
     clearTimeout(state.resizeTimer);
     deactivateCropFrame();
     clearHighlights();
+    clearInteractionHint();
     updateBar();
   }
 
@@ -262,6 +265,30 @@
         text-align: center;
         text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
         will-change: left, top, width, height;
+      }
+      #${INTERACTION_HINT_ID} {
+        position: fixed;
+        left: 50%;
+        top: 64px;
+        z-index: 2147483646;
+        max-width: min(360px, calc(100vw - 28px));
+        padding: 9px 13px;
+        transform: translateX(-50%) translateY(-4px);
+        border: 1px solid rgba(255, 255, 255, 0.42);
+        border-radius: 999px;
+        background: rgba(20, 22, 24, 0.82);
+        color: #fff;
+        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+        font: 600 13px/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0;
+        opacity: 0;
+        pointer-events: none;
+        text-align: center;
+        transition: opacity .16s ease, transform .16s ease;
+      }
+      #${INTERACTION_HINT_ID}.__hpe_visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
       }
       .${CROP_ACTIVE_CLASS} {
         overflow: hidden !important;
@@ -521,6 +548,7 @@
   function createCleanSnapshot() {
     const body = document.body.cloneNode(true);
     body.querySelector(`#${BAR_ID}`)?.remove();
+    body.querySelector(`#${INTERACTION_HINT_ID}`)?.remove();
     body.querySelectorAll(`.${CROP_HANDLE_CLASS}`).forEach((el) => el.remove());
     body.querySelectorAll(`.${CROP_ACTIVE_CLASS}`).forEach((el) => {
       el.classList.remove(CROP_ACTIVE_CLASS);
@@ -576,6 +604,7 @@
 
   function blockPageAction(event) {
     if (!state.active || isBarElement(event.target)) return;
+    if (isBlockedInteractionTarget(event.target)) showInteractionHint();
     event.preventDefault();
     event.stopImmediatePropagation();
   }
@@ -583,6 +612,9 @@
   function stopInteractiveHandlers(event) {
     if (!state.active || isBarElement(event.target)) return;
     if (!event.target.closest || !event.target.closest(INTERACTIVE_SELECTOR)) return;
+    if (event.type === "pointerdown" || event.type === "mousedown" || event.type === "touchstart") {
+      showInteractionHint();
+    }
     event.stopImmediatePropagation();
   }
 
@@ -594,6 +626,33 @@
 
   function isBarElement(target) {
     return Boolean(target && target.closest && target.closest(`#${BAR_ID}`));
+  }
+
+  function isBlockedInteractionTarget(target) {
+    return Boolean(target && target.closest && target.closest(INTERACTIVE_SELECTOR));
+  }
+
+  function showInteractionHint() {
+    clearTimeout(state.interactionHintTimer);
+    let hint = document.getElementById(INTERACTION_HINT_ID);
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.id = INTERACTION_HINT_ID;
+      hint.contentEditable = "false";
+      hint.textContent = "Pause editing to interact with this element";
+      document.body.appendChild(hint);
+    }
+    requestAnimationFrame(() => hint.classList.add("__hpe_visible"));
+    state.interactionHintTimer = window.setTimeout(clearInteractionHint, 2200);
+  }
+
+  function clearInteractionHint() {
+    clearTimeout(state.interactionHintTimer);
+    state.interactionHintTimer = 0;
+    const hint = document.getElementById(INTERACTION_HINT_ID);
+    if (!hint) return;
+    hint.classList.remove("__hpe_visible");
+    window.setTimeout(() => hint.remove(), 180);
   }
 
   function onDragOver(event) {
