@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Maldives Blue Hours · HTML Slides</title>
 <link rel="preconnect" href="https://images.unsplash.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Playfair+Display:wght@600;700;800&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#092b34;
@@ -35,17 +34,21 @@
   h1{font:800 clamp(76px,11vw,150px)/.86 var(--display);letter-spacing:0;margin:0;color:#fffef4;text-wrap:balance}
   .lead{max-width:720px;margin:3vh 0 0;font:400 clamp(22px,2.25vw,34px)/1.28 var(--serif);color:#f8f5e8}
   .hero-meta{display:flex;gap:2.2vw;margin-top:4.2vh;font:500 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.78)}
-  .gallery{background:linear-gradient(180deg,#f9f0dc,#e8f8f3 58%,#d6f1ee);color:var(--ink);display:grid;grid-template-rows:auto 1fr auto;gap:3.2vh}
+  .gallery{background:linear-gradient(180deg,#f9f0dc,#e8f8f3 58%,#d6f1ee);color:var(--ink);display:grid;grid-template-rows:auto auto 1fr auto;gap:2vh}
   .gallery .chrome,.gallery .foot{color:rgba(9,43,52,.68)}
   .gallery-head{position:relative;z-index:2;display:grid;grid-template-columns:1.1fr .9fr;gap:4vw;align-items:end}
   .gallery h2{font:800 clamp(48px,6.6vw,92px)/.9 var(--display);letter-spacing:0;margin:0;color:#092b34}
   .gallery-copy{font:400 clamp(18px,1.55vw,25px)/1.35 var(--serif);max-width:560px;color:rgba(9,43,52,.78)}
-  .mosaic{position:relative;z-index:2;display:grid;grid-template-columns:1.2fr .76fr .94fr;grid-template-rows:1.05fr .92fr;gap:18px;min-height:0}
-  figure{margin:0;min-width:0}
-  .frame-img{position:relative;overflow:hidden;border-radius:8px;background:rgba(9,43,52,.08);height:100%;min-height:0}
+  .mosaic{position:relative;z-index:2;display:grid;grid-template-columns:1.2fr .76fr .94fr;grid-template-rows:1fr 1fr 1fr;gap:14px;min-height:0}
+  figure{margin:0;min-width:0;min-height:0}
+  .frame-img{position:relative;overflow:hidden;border-radius:8px;background:rgba(9,43,52,.08);min-height:0}
   .frame-img > img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
-  .frame-img.big{grid-row:1 / span 2}
-  .frame-img.wide{grid-column:2 / span 2}
+  .frame-img.f1{grid-column:1;grid-row:1 / span 3}
+  .frame-img.f2{grid-column:2;grid-row:1}
+  .frame-img.f3{grid-column:3;grid-row:1}
+  .frame-img.f4{grid-column:2 / span 2;grid-row:2}
+  .frame-img.f5{grid-column:2;grid-row:3}
+  .frame-img.f6{grid-column:3;grid-row:3}
   .cap{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;display:flex;justify-content:space-between;gap:12px;font:600 10px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#fff;text-shadow:0 1px 12px rgba(0,0,0,.62)}
   .frame-img::after{content:"";position:absolute;inset:auto 0 0;height:38%;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.42));pointer-events:none}
   .note-strip{position:relative;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);gap:1.4vw;font:500 11px/1.45 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(9,43,52,.68)}
@@ -56,25 +59,233 @@
   @media(max-width:760px){
     .slide{padding:5vh 5vw 8vh}
     .gallery-head{grid-template-columns:1fr;gap:1.8vh}
-    .mosaic{grid-template-columns:1fr 1fr;grid-template-rows:1.1fr .9fr .9fr;gap:12px}
-    .frame-img.big{grid-row:1 / span 2}
-    .frame-img.wide{grid-column:1 / span 2}
+    .mosaic{grid-template-columns:1.2fr .76fr .94fr;gap:10px}
     .note-strip{grid-template-columns:1fr 1fr}
     .hero-content{max-width:92vw}
   }
 </style>
-</head>
-<body>
+<style id="__html_presentation_editor_styles">
+      @keyframes __hpe_breathe {
+        0%, 100% {
+          opacity: 1;
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.42);
+        }
+        50% {
+          opacity: .62;
+          transform: scale(.78);
+          box-shadow: 0 0 0 5px rgba(255, 255, 255, 0);
+        }
+      }
+      #__html_presentation_editor_bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 2147483647;
+        height: 56px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        column-gap: 14px;
+        padding: 0 16px;
+        background: transparent;
+        color: #fff;
+        border-bottom: 0;
+        box-shadow: none;
+        font: 500 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0;
+        user-select: none;
+      }
+      #__html_presentation_editor_bar::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background: linear-gradient(90deg,
+          #00c853 0%,
+          #00bcd4 30%,
+          #2979ff 62%,
+          #7c4dff 100%
+        );
+        -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0) 100%);
+        mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0) 100%);
+      }
+      #__html_presentation_editor_bar * { box-sizing: border-box; }
+      #__html_presentation_editor_bar > * {
+        position: relative;
+        z-index: 1;
+        transform: translateY(-3px);
+      }
+      #__html_presentation_editor_bar .__hpe_title {
+        font-weight: 700;
+        justify-self: start;
+      }
+      #__html_presentation_editor_bar .__hpe_toggle {
+        margin-left: 0;
+        justify-self: center;
+        position: relative;
+        min-width: 82px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        background: transparent;
+        color: #fff;
+        font-weight: 650;
+      }
+      #__html_presentation_editor_bar .__hpe_toggle:hover {
+        background: transparent;
+        opacity: 1;
+      }
+      #__html_presentation_editor_bar .__hpe_toggle::after {
+        content: attr(data-hpe-tip);
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%) translateY(-2px);
+        width: max-content;
+        max-width: calc(100vw - 32px);
+        padding: 8px 11px;
+        border-radius: 10px;
+        background: rgba(20, 20, 24, 0.84);
+        color: #fff;
+        font-size: 12px;
+        line-height: 1.35;
+        font-weight: 500;
+        white-space: normal;
+        overflow-wrap: break-word;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity .16s ease, transform .16s ease;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      }
+      #__html_presentation_editor_bar .__hpe_toggle:hover::after,
+      #__html_presentation_editor_bar .__hpe_toggle:focus-visible::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      #__html_presentation_editor_bar .__hpe_state_dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        border: 1px solid currentColor;
+        flex: 0 0 auto;
+      }
+      #__html_presentation_editor_bar .__hpe_toggle.__hpe_active .__hpe_state_dot {
+        border-color: transparent;
+        background: currentColor;
+        animation: __hpe_breathe 1.6s ease-in-out infinite;
+      }
+      body.low-power #__html_presentation_editor_bar .__hpe_toggle.__hpe_active .__hpe_state_dot {
+        animation: __hpe_breathe 1.6s ease-in-out infinite !important;
+      }
+      #__html_presentation_editor_bar .__hpe_toggle.__hpe_paused .__hpe_state_dot {
+        background: transparent;
+        animation: none;
+      }
+      #__html_presentation_editor_bar .__hpe_actions {
+        justify-self: end;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #__html_presentation_editor_bar button {
+        height: 30px;
+        border: 0;
+        border-radius: 8px;
+        padding: 0 11px;
+        color: #fff;
+        background: transparent;
+        font: inherit;
+        cursor: pointer;
+      }
+      #__html_presentation_editor_bar button:hover {
+        background: transparent;
+        opacity: .78;
+      }
+      [data-hpe-highlight="true"] {
+        outline: 0 !important;
+        box-shadow: none !important;
+      }
+      #__html_presentation_editor_drop_overlay {
+        position: fixed;
+        z-index: 2147483646;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        border: 0;
+        background: rgba(0, 0, 0, 0.32);
+        color: #fff;
+        font: 700 14px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: .01em;
+        text-align: center;
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+        will-change: left, top, width, height;
+      }
+      .frame-img.__hpe_crop_active {
+        overflow: hidden !important;
+      }
+      .frame-img.__hpe_crop_active img[data-hpe-crop="true"] {
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+        will-change: transform, object-position;
+      }
+      body.__hpe_crop_dragging .frame-img.__hpe_crop_active img[data-hpe-crop="true"] {
+        cursor: grabbing;
+      }
+      .__hpe_crop_handle {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        z-index: 2147483645;
+        width: 26px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        color: #fff;
+        cursor: nwse-resize;
+        pointer-events: auto;
+      }
+      .__hpe_crop_handle svg {
+        width: 22px;
+        height: 22px;
+        display: block;
+        filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.72));
+        pointer-events: none;
+      }
+    </style></head>
+<body class="__hpe_editing"><div id="__html_presentation_editor_bar" contenteditable="false">
+        <div class="__hpe_title">HTML Slides Editor</div>
+        <button type="button" class="__hpe_toggle __hpe_active" data-hpe-action="toggle" data-hpe-tip="Edit text freely. Drag and drop to replace an image.">
+          <span class="__hpe_state_dot" aria-hidden="true" style="opacity: 0.655; transform: scale(0.819); box-shadow: rgba(255, 255, 255, 0.15) 0px 0px 0px 2px;"></span>
+          <span data-hpe-toggle-label="">Editing</span>
+        </button>
+        <div class="__hpe_actions">
+          <button type="button" data-hpe-action="undo">Undo</button>
+          <button type="button" data-hpe-action="redo">Redo</button>
+        </div>
+      </div>
 <main id="deck">
   <section class="slide hero">
-    <img class="hero-img" src="https://images.unsplash.com/photo-1573843981267-be1999ff37cd?auto=format&fit=crop&w=2400&q=86" alt="Overwater villas and turquoise lagoon in the Maldives">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1573843981267-be1999ff37cd?auto=format&amp;fit=crop&amp;w=2400&amp;q=86" alt="Overwater villas and turquoise lagoon in the Maldives">
     <div class="chrome">
       <div>Maldives · Blue Hours</div>
       <div>01 / 02</div>
     </div>
     <div class="hero-content">
-      <div class="kicker">Indian Ocean / Island Notes</div>
-      <h1>Maldives<br>in slow blue</h1>
+      <div class="kicker">Indian Ocean / Island Notes </div>
+      <h1>M0aldives999<br>in slow blue</h1>
       <p class="lead">A short escape built around clear water, quiet mornings, reef light, and dinners that begin when the sky turns coral.</p>
       <div class="hero-meta">
         <span>Atolls</span>
@@ -99,28 +310,28 @@
       <p class="gallery-copy">Build the trip around water texture: the aerial arrival, the reef edge, the sandbank walk, the villa shade, the boat hour, and the last warm light.</p>
     </div>
     <div class="mosaic">
-      <figure class="frame-img big">
-        <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=1400&q=84" alt="Turquoise island lagoon from above">
+      <figure class="frame-img f1">
+        <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&amp;fit=crop&amp;w=1400&amp;q=84" alt="Turquoise island lagoon from above">
         <figcaption class="cap"><span>Aerial reef</span><span>01</span></figcaption>
       </figure>
-      <figure class="frame-img">
-        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=84" alt="White beach and clear ocean water">
+      <figure class="frame-img f2">
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&amp;fit=crop&amp;w=1200&amp;q=84" alt="White beach and clear ocean water">
         <figcaption class="cap"><span>Sand hour</span><span>02</span></figcaption>
       </figure>
-      <figure class="frame-img">
-        <img src="https://images.unsplash.com/photo-1540202404-d367cb9c16ca?auto=format&fit=crop&w=1200&q=84" alt="Tropical resort coastline and ocean">
+      <figure class="frame-img f3">
+        <img src="https://images.unsplash.com/photo-1573843981267-be1999ff37cd?auto=format&amp;fit=crop&amp;w=1200&amp;q=84" alt="Tropical resort coastline and ocean">
         <figcaption class="cap"><span>Villa edge</span><span>03</span></figcaption>
       </figure>
-      <figure class="frame-img wide">
-        <img src="https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?auto=format&fit=crop&w=1800&q=84" alt="Tropical sea and island sunset">
+      <figure class="frame-img f4">
+        <img src="https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?auto=format&amp;fit=crop&amp;w=1800&amp;q=84" alt="Tropical sea and island sunset">
         <figcaption class="cap"><span>Coral light</span><span>04</span></figcaption>
       </figure>
-      <figure class="frame-img">
-        <img src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=1200&q=84" alt="Palm trees and blue water">
+      <figure class="frame-img f5">
+        <img src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&amp;fit=crop&amp;w=1200&amp;q=84" alt="Palm trees and blue water">
         <figcaption class="cap"><span>Palm shade</span><span>05</span></figcaption>
       </figure>
-      <figure class="frame-img">
-        <img src="https://images.unsplash.com/photo-1512100356356-de1b84283e18?auto=format&fit=crop&w=1200&q=84" alt="Boat on tropical clear water">
+      <figure class="frame-img f6">
+        <img src="https://images.unsplash.com/photo-1512100356356-de1b84283e18?auto=format&amp;fit=crop&amp;w=1200&amp;q=84" alt="Boat on tropical clear water">
         <figcaption class="cap"><span>Boat transfer</span><span>06</span></figcaption>
       </figure>
     </div>
@@ -136,7 +347,7 @@
     </div>
   </section>
 </main>
-<nav id="nav" aria-label="Slides">
+<nav id="nav" aria-label="Slides" contenteditable="false">
   <button class="active" type="button" aria-label="Slide 1"></button>
   <button type="button" aria-label="Slide 2"></button>
 </nav>
@@ -149,12 +360,83 @@
     deck.style.transform = `translateX(${-current * 100}vw)`;
     dots.forEach((dot, i) => dot.classList.toggle("active", i === current));
   }
-  dots.forEach((dot, i) => dot.addEventListener("click", () => go(i)));
+  function wireNav() {
+    dots.forEach((dot, i) => {
+      dot.onclick = () => go(i);
+    });
+  }
+  wireNav();
   window.addEventListener("keydown", (event) => {
     if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") go(current + 1);
     if (event.key === "ArrowLeft" || event.key === "PageUp") go(current - 1);
   });
 </script>
-<script src="./assets/html-slides-editor-runtime.js?v=20260611-auto-tooltip"></script>
-</body>
-</html>
+<script src="./assets/html-slides-editor-runtime.js?v=20260611-drag-overlay"></script>
+<script>
+(function () {
+  var saveTimer = null;
+  var DELAY = 1800; // ms after last change before saving
+
+  function showSaved() {
+    var bar = document.getElementById("__html_presentation_editor_bar");
+    if (!bar) return;
+    var existing = bar.querySelector(".__autosave_label");
+    if (existing) existing.remove();
+    var el = document.createElement("span");
+    el.className = "__autosave_label";
+    el.textContent = "Saved";
+    el.style.cssText = "font:500 12px/1 inherit;letter-spacing:.06em;opacity:0;transition:opacity .25s;color:rgba(255,255,255,.72);margin-left:10px;";
+    bar.querySelector(".__hpe_actions") && bar.querySelector(".__hpe_actions").appendChild(el);
+    requestAnimationFrame(function(){ el.style.opacity = "1"; });
+    setTimeout(function(){ el.style.opacity = "0"; setTimeout(function(){ el.remove(); }, 300); }, 2000);
+  }
+
+  function doSave() {
+    // Strip the autosave label before saving
+    var label = document.querySelector(".__autosave_label");
+    if (label) label.remove();
+    var html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    fetch("/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ html: html })
+    }).then(function(r){ return r.json(); }).then(function(d){ if (d.ok) showSaved(); });
+  }
+
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(doSave, DELAY);
+  }
+
+  // Watch for DOM mutations (text edits, image replacements, etc.)
+  var observer = new MutationObserver(function(mutations) {
+    // Ignore changes inside the editor bar itself
+    for (var i = 0; i < mutations.length; i++) {
+      var target = mutations[i].target;
+      if (target.closest && target.closest("#__html_presentation_editor_bar")) continue;
+      scheduleSave();
+      return;
+    }
+  });
+
+  // Start observing once the editor bar is ready
+  function startObserver() {
+    observer.observe(document.body, {
+      childList: true, subtree: true,
+      characterData: true, attributes: true,
+      attributeFilter: ["src", "data-hpe-crop-scale", "data-hpe-crop-position-x",
+                        "data-hpe-crop-position-y", "data-hpe-crop-translate-x",
+                        "data-hpe-crop-translate-y"]
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startObserver);
+  } else {
+    startObserver();
+  }
+})();
+</script>
+
+
+</body></html>

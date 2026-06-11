@@ -1,6 +1,6 @@
 ---
 name: html-slides-editor
-description: Add an embedded manual editing layer to AI-generated HTML slides so the preview itself shows a top editing banner with editing status, pause/resume editing, undo/redo, direct text editing, and drag-to-replace images.
+description: Add an embedded manual editing layer to AI-generated HTML slides so the preview itself shows a top editing banner with editing status, pause/resume editing, undo/redo, direct text editing, drag-to-replace images, and auto-save back to disk.
 metadata:
   short-description: Embedded editor for HTML slides
 ---
@@ -71,13 +71,155 @@ The embedded runtime should:
 
 ## Persistence
 
-By default, this editor changes the live preview DOM. That is enough for quick manual polish during a preview session, but it does not automatically update the source file after reload.
+By default, this editor changes the live preview DOM only. That is enough for a quick session, but changes are lost on reload.
 
-If the user needs durable output, add an explicit save/export feature:
+### Auto-Save (recommended)
 
-- Export current `document.documentElement.outerHTML` after removing transient editor highlights.
-- Keep the embedded editor runtime in the exported file unless the user asks for a clean final HTML.
-- For image replacements from local files, use Data URLs instead of object URLs when durable export is required.
+When the user wants durable edits, replace `npx serve` with a small Node.js server (`server.js`) that has a `POST /save` endpoint, and add an inline auto-save script to the HTML after the runtime `<script>` tag.
+
+**`server.js`** — place it next to `index.html`:
+
+```js
+#!/usr/bin/env node
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+const ROOT = __dirname;
+const PORT = 3457; // adjust per deck
+
+const MIME = { ".html":"text/html;charset=utf-8", ".js":"application/javascript",
+  ".css":"text/css", ".jpg":"image/jpeg", ".jpeg":"image/jpeg",
+  ".png":"image/png", ".svg":"image/svg+xml", ".woff2":"font/woff2" };
+
+http.createServer((req, res) => {
+  res.setHeader("Access-Control-Allow-Origin","*");
+  res.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers","Content-Type");
+  if (req.method==="OPTIONS"){res.writeHead(204);res.end();return;}
+  if (req.method==="POST" && req.url==="/save"){
+    let body="";
+    req.on("data",c=>{body+=c;});
+    req.on("end",()=>{
+      try{
+        const {html}=JSON.parse(body);
+        fs.writeFileSync(path.join(ROOT,"index.html"),html,"utf-8");
+        res.writeHead(200,{"Content-Type":"application/json"});
+        res.end(JSON.stringify({ok:true}));
+        console.log("[save] index.html updated");
+      }catch(e){
+        res.writeHead(500,{"Content-Type":"application/json"});
+        res.end(JSON.stringify({ok:false,error:String(e)}));
+      }
+    });
+    return;
+  }
+  let filePath=path.join(ROOT,req.url==="/"?"/index.html":req.url).split("?")[0];
+  fs.readFile(filePath,(err,data)=>{
+    if(err){res.writeHead(404);res.end("Not found");return;}
+    const ext=path.extname(filePath).toLowerCase();
+    res.writeHead(200,{"Content-Type":MIME[ext]||"application/octet-stream"});
+    res.end(data);
+  });
+}).listen(PORT,()=>console.log(`[html-slides] serving at http://localhost:${PORT}`));
+```
+
+Update `.claude/launch.json` to use `node` instead of `npx serve`:
+
+```json
+{
+  "name": "maldives-slides",
+  "runtimeExecutable": "node",
+  "runtimeArgs": ["PPT for HTML/decks/maldives-travel/ppt/server.js"],
+  "port": 3457
+}
+```
+
+**Auto-save inline script** — add after the runtime `<script>` tag, before `</body>`:
+
+```html
+<script>
+(function () {
+  var saveTimer = null;
+  var DELAY = 1800; // ms after last change before saving
+
+  function showSaved() {
+    var bar = document.getElementById("__html_presentation_editor_bar");
+    if (!bar) return;
+    var existing = bar.querySelector(".__autosave_label");
+    if (existing) existing.remove();
+    var el = document.createElement("span");
+    el.className = "__autosave_label";
+    el.textContent = "Saved";
+    el.style.cssText = "font:500 12px/1 inherit;letter-spacing:.06em;opacity:0;transition:opacity .25s;color:rgba(255,255,255,.72);margin-left:10px;";
+    bar.querySelector(".__hpe_actions") && bar.querySelector(".__hpe_actions").appendChild(el);
+    requestAnimationFrame(function(){ el.style.opacity = "1"; });
+    setTimeout(function(){ el.style.opacity="0"; setTimeout(function(){ el.remove(); },300); }, 2000);
+  }
+
+  function doSave() {
+    var label = document.querySelector(".__autosave_label");
+    if (label) label.remove();
+    var html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    fetch("/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ html: html })
+    }).then(function(r){ return r.json(); }).then(function(d){ if (d.ok) showSaved(); });
+  }
+
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(doSave, DELAY);
+  }
+
+  var observer = new MutationObserver(function(mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      var target = mutations[i].target;
+      if (target.closest && target.closest("#__html_presentation_editor_bar")) continue;
+      scheduleSave();
+      return;
+    }
+  });
+
+  function startObserver() {
+    observer.observe(document.body, {
+      childList: true, subtree: true,
+      characterData: true, attributes: true,
+      attributeFilter: ["src","data-hpe-crop-scale","data-hpe-crop-position-x",
+                        "data-hpe-crop-position-y","data-hpe-crop-translate-x",
+                        "data-hpe-crop-translate-y"]
+    });
+  }
+
+  if (document.readyState==="loading") {
+    document.addEventListener("DOMContentLoaded", startObserver);
+  } else {
+    startObserver();
+  }
+})();
+</script>
+```
+
+**Behavior:** 1.8 seconds after any edit (text or image), the page POSTs `document.documentElement.outerHTML` to `/save`. The server writes it back to `index.html`. A **"Saved"** label appears in the editor bar and fades out after 2 seconds. Changes survive page reload.
+
+### Known issue: designMode and slide navigation
+
+When `document.designMode = "on"` is active, `<button>` elements inside the editable document lose their click-event behavior. To protect slide navigation:
+
+- Add `contenteditable="false"` to the nav container: `<nav id="nav" ... contenteditable="false">`.
+- Use `element.onclick = handler` (property assignment) instead of `addEventListener` for nav buttons — this is more robust under designMode than `addEventListener`.
+
+```html
+<nav id="nav" aria-label="Slides" contenteditable="false">
+  ...
+</nav>
+<script>
+  function wireNav() {
+    dots.forEach((dot, i) => { dot.onclick = () => go(i); });
+  }
+  wireNav();
+</script>
+```
 
 ## Presentation Compatibility
 
@@ -99,7 +241,8 @@ Before finishing, verify:
 - Undo/redo work for typed text.
 - Dragging an image over an existing visual highlights the target.
 - Dropping the image replaces the intended visual.
-- Normal slides interaction returns after editing stops.
+- Normal slides interaction (pagination, keyboard nav) returns after editing stops.
+- If auto-save is enabled: editing triggers a save after ~1.8 s, "Saved" appears in the bar and fades out, and the change survives a page reload.
 
 ## Output Style
 

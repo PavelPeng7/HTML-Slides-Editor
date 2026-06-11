@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "html-slides",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3456", "PPT for HTML/decks/ai-workflow-methodology/ppt"],
+      "port": 3456
+    },
+    {
+      "name": "maldives-slides",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["PPT for HTML/decks/maldives-travel/ppt/server.js"],
+      "port": 3457
+    }
+  ]
+}
