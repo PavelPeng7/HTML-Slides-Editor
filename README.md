@@ -16,8 +16,6 @@ AI agents are good at generating HTML slides, but tiny presentation edits should
 - Undo and redo for editing sessions
 - Pause editing to restore normal slide navigation
 - Auto-save back to `index.html`
-- Clean save output that strips temporary editor UI before writing
-- No Chrome extension required
 
 ## Skill Location
 
@@ -61,17 +59,6 @@ http://127.0.0.1:8765/
 ```
 
 Do not use `file://` when edits need to persist. Browsers cannot write local files from a direct file preview.
-
-## How Persistence Works
-
-The skill injects two things into the target deck:
-
-- `html-slides-editor-runtime.js`, which provides the editing UI and interactions
-- an auto-save snippet, which posts a cleaned clone of the document to `/save`
-
-The generated `html-slides-editor-server.js` receives the save request and writes the cleaned HTML back to `index.html`.
-
-The saved HTML keeps user edits such as text, image data URLs, SVG image references, background image URLs, and crop metadata. It strips temporary editor chrome such as the editor bar, injected runtime styles, drag overlays, crop handles, and active editing classes.
 
 ## Distribution Checklist
 
