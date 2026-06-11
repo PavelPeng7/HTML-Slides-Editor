@@ -145,43 +145,10 @@
       line-height: 1.58;
     }
 
-    .workflow {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .step,
     .command {
       border: 1px solid var(--line);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.62);
-    }
-
-    .step {
-      padding: 22px;
-      min-height: 178px;
-    }
-
-    .num {
-      display: block;
-      color: var(--blue);
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    .step strong {
-      display: block;
-      margin-top: 18px;
-      font-size: 20px;
-      line-height: 1.2;
-    }
-
-    .step p {
-      margin: 12px 0 0;
-      color: var(--muted);
     }
 
     .preview {
@@ -277,7 +244,6 @@
         grid-template-columns: 1fr;
       }
 
-      .workflow,
       .preview {
         grid-template-columns: 1fr;
       }
@@ -330,23 +296,6 @@
         <div class="section-title">
           <h2>Built for the last mile of slide making.</h2>
           <p>AI agents can draft the deck. Humans still need fast, tactile control over final wording, image swaps, and visual framing. This skill keeps that loop inside the HTML preview.</p>
-        </div>
-        <div class="workflow">
-          <div class="step">
-            <span class="num">Step 01</span>
-            <strong>Generate HTML slides</strong>
-            <p>Use your agent to create a normal HTML presentation with DOM text and image assets.</p>
-          </div>
-          <div class="step">
-            <span class="num">Step 02</span>
-            <strong>Enable editing</strong>
-            <p>The skill injects a compact editor bar, runtime, auto-save snippet, and local save server.</p>
-          </div>
-          <div class="step">
-            <span class="num">Step 03</span>
-            <strong>Edit in the preview</strong>
-            <p>Type directly on rendered text, drop images onto existing visuals, crop them, and reload safely.</p>
-          </div>
         </div>
       </div>
     </section>
