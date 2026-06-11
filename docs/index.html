@@ -152,7 +152,6 @@
     }
 
     .step,
-    .feature,
     .command {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -173,16 +172,14 @@
       text-transform: uppercase;
     }
 
-    .step strong,
-    .feature strong {
+    .step strong {
       display: block;
       margin-top: 18px;
       font-size: 20px;
       line-height: 1.2;
     }
 
-    .step p,
-    .feature p {
+    .step p {
       margin: 12px 0 0;
       color: var(--muted);
     }
@@ -234,29 +231,6 @@
       filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.42));
     }
 
-    .features {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .feature {
-      padding: 20px;
-      min-height: 190px;
-    }
-
-    .feature span {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      color: var(--white);
-      font-weight: 860;
-      background: linear-gradient(135deg, var(--green), var(--blue), var(--violet));
-    }
-
     .install {
       display: grid;
       grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
@@ -304,8 +278,7 @@
       }
 
       .workflow,
-      .preview,
-      .features {
+      .preview {
         grid-template-columns: 1fr;
       }
 
@@ -399,37 +372,6 @@
               <path d="M793.002667 853.333333l-97.834667-97.834666a42.666667 42.666667 0 0 1 60.330667-60.330667L853.333333 793.002667V725.333333a42.666667 42.666667 0 0 1 85.333334 0v213.333334h-213.333334a42.666667 42.666667 0 0 1 0-85.333334h67.669334z m0-682.666666H725.333333a42.666667 42.666667 0 0 1 0-85.333334h213.333334v213.333334a42.666667 42.666667 0 0 1-85.333334 0V230.997333l-97.834666 97.834667a42.666667 42.666667 0 0 1-60.330667-60.330667L793.002667 170.666667zM170.666667 230.997333V298.666667a42.666667 42.666667 0 1 1-85.333334 0V85.333333h213.333334a42.666667 42.666667 0 1 1 0 85.333334H230.997333l97.834667 97.834666a42.666667 42.666667 0 0 1-60.330667 60.330667L170.666667 230.997333zM230.997333 853.333333H298.666667a42.666667 42.666667 0 0 1 0 85.333334H85.333333v-213.333334a42.666667 42.666667 0 0 1 85.333334 0v67.669334l97.834666-97.834667a42.666667 42.666667 0 1 1 60.330667 60.330667L230.997333 853.333333z" fill="currentColor"></path>
             </svg>
           </figure>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <div class="section-title">
-          <h2>What the skill packages.</h2>
-          <p>A store-ready skill needs more than a script. This repository includes the instructions, runtime assets, switch tool, metadata, examples, and MIT license.</p>
-        </div>
-        <div class="features">
-          <div class="feature">
-            <span>1</span>
-            <strong>Skill entry point</strong>
-            <p><code>.codex/skills/html-slides-editor/SKILL.md</code> defines when and how Codex should use it.</p>
-          </div>
-          <div class="feature">
-            <span>2</span>
-            <strong>Bundled runtime</strong>
-            <p>The JavaScript editor, autosave snippet, and local save server live under <code>assets/</code>.</p>
-          </div>
-          <div class="feature">
-            <span>3</span>
-            <strong>Idempotent switch</strong>
-            <p>The Python switch script can enable or disable the editor repeatedly without duplicate injection.</p>
-          </div>
-          <div class="feature">
-            <span>4</span>
-            <strong>Store metadata</strong>
-            <p><code>agents/openai.yaml</code> provides a display name, short description, and default prompt.</p>
-          </div>
         </div>
       </div>
     </section>
