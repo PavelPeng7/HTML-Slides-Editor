@@ -1,6 +1,7 @@
 (() => {
   const BAR_ID = "__html_presentation_editor_bar";
   const STYLE_ID = "__html_presentation_editor_styles";
+  const DROP_OVERLAY_ID = "__html_presentation_editor_drop_overlay";
   const CLICK_BLOCK_EVENTS = ["click", "dblclick", "auxclick"];
   const POINTER_BLOCK_EVENTS = ["pointerdown", "mousedown", "touchstart", "pointerup", "mouseup", "touchend"];
   const GESTURE_BLOCK_EVENTS = ["wheel", "touchstart", "touchmove", "touchend"];
@@ -35,7 +36,8 @@
     commitTimer: null,
     restoring: false,
     dotRAF: 0,
-    highlightedElement: null
+    highlightedElement: null,
+    dragClearTimer: 0
   };
 
   function enable() {
@@ -221,21 +223,21 @@
         outline: 0 !important;
         box-shadow: none !important;
       }
-      body.__hpe_file_dragging .frame-img:hover::after {
-        content: "Drop your new image here";
-        position: absolute;
-        inset: 0;
-        z-index: 20;
+      #${DROP_OVERLAY_ID} {
+        position: fixed;
+        z-index: 2147483646;
         display: flex;
         align-items: center;
         justify-content: center;
         pointer-events: none;
+        border: 0;
         background: rgba(0, 0, 0, 0.32);
         color: #fff;
         font: 700 14px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         letter-spacing: .01em;
         text-align: center;
         text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+        will-change: left, top, width, height;
       }
     `;
     document.head.appendChild(style);
@@ -487,11 +489,16 @@
   }
 
   function onDragOver(event) {
-    if (!state.active || isBarElement(event.target)) return;
+    if (!state.active || isBarElement(event.target) || !hasFileDrag(event)) {
+      clearHighlights();
+      return;
+    }
     event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
     document.body.classList.add("__hpe_file_dragging");
+    scheduleDragClear();
     const visual = findReplaceableVisual(event.target, event.clientX, event.clientY);
-    if (visual) highlightVisual(visual.element);
+    if (visual) highlightVisual(visual);
     else clearHighlights();
   }
 
@@ -502,6 +509,9 @@
       event.clientX >= window.innerWidth ||
       event.clientY >= window.innerHeight;
     if (outside) clearHighlights();
+    if (state.highlightedElement && !rectContainsPoint(state.highlightedElement.getBoundingClientRect(), event.clientX, event.clientY)) {
+      clearHighlights();
+    }
   }
 
   function onDrop(event) {
@@ -519,33 +529,42 @@
     return file && file.type.startsWith("image/") ? file : null;
   }
 
-  function findReplaceableVisual(element, x, y) {
-    return findVisualFromElement(element) || findVisualAtPoint(x, y);
+  function hasFileDrag(event) {
+    const dataTransfer = event.dataTransfer;
+    if (!dataTransfer) return false;
+    const items = Array.from(dataTransfer.items || []);
+    if (items.length) return items.some((item) => item.kind === "file");
+    return Array.from(dataTransfer.types || []).includes("Files");
   }
 
-  function findVisualFromElement(element) {
-    let el = element;
-    while (el && el !== document.body) {
-      const visual = getVisualForElement(el);
-      if (visual) return visual;
-      if (el.querySelectorAll) {
-        const visuals = el.querySelectorAll(VISUAL_SELECTOR);
-        if (visuals.length === 1) return getVisualForElement(visuals[0]);
-      }
-      el = el.parentElement;
-    }
-    return null;
+  function findReplaceableVisual(element, x, y) {
+    return findVisualAtPoint(x, y);
   }
 
   function findVisualAtPoint(x, y) {
     if (typeof x !== "number" || typeof y !== "number") return null;
-    const pointVisual = document.elementsFromPoint(x, y).map(getVisualForElement).find(Boolean);
+    const pointVisual = document.elementsFromPoint(x, y).map(getVisualForPointElement).find(Boolean);
     if (pointVisual) return pointVisual;
-    return [...document.querySelectorAll(`${VISUAL_SELECTOR}, *`)]
-      .map(getVisualForElement)
+    return [...document.querySelectorAll(`.frame-img, ${VISUAL_SELECTOR}`)]
+      .filter((element) => rectContainsPoint(element.getBoundingClientRect(), x, y))
+      .map(getVisualForPointElement)
       .filter(Boolean)
-      .filter(({ element }) => rectContainsPoint(element.getBoundingClientRect(), x, y))
-      .sort((a, b) => rectArea(a.element.getBoundingClientRect()) - rectArea(b.element.getBoundingClientRect()))[0] || null;
+      .sort((a, b) => rectArea(getDropOverlayElement(a).getBoundingClientRect()) - rectArea(getDropOverlayElement(b).getBoundingClientRect()))[0] || null;
+  }
+
+  function getVisualForPointElement(el) {
+    const visual = getVisualForElement(el);
+    if (visual) return visual;
+    const frame = el && el.closest && el.closest(".frame-img");
+    if (!frame || isBarElement(frame)) return null;
+    return getFrameVisual(frame);
+  }
+
+  function getFrameVisual(frame) {
+    const visual = getVisualForElement(frame);
+    if (visual) return visual;
+    const visuals = frame.querySelectorAll(VISUAL_SELECTOR);
+    return visuals.length === 1 ? getVisualForElement(visuals[0]) : null;
   }
 
   function getVisualForElement(el) {
@@ -598,20 +617,56 @@
   }
 
   function clearHighlights() {
+    clearTimeout(state.dragClearTimer);
+    state.dragClearTimer = 0;
     document.querySelectorAll("[data-hpe-highlight]").forEach((el) => {
       el.removeAttribute("data-hpe-highlight");
     });
     state.highlightedElement = null;
     document.body.classList.remove("__hpe_file_dragging");
+    document.getElementById(DROP_OVERLAY_ID)?.remove();
   }
 
-  function highlightVisual(element) {
+  function highlightVisual(visual) {
+    const element = getDropOverlayElement(visual);
     if (!element) return;
     if (state.highlightedElement && state.highlightedElement !== element) {
       state.highlightedElement.removeAttribute("data-hpe-highlight");
     }
     state.highlightedElement = element;
     element.setAttribute("data-hpe-highlight", "true");
+    showDropOverlay(element);
+  }
+
+  function showDropOverlay(element) {
+    const rect = element.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      clearHighlights();
+      return;
+    }
+    let overlay = document.getElementById(DROP_OVERLAY_ID);
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = DROP_OVERLAY_ID;
+      overlay.textContent = "Drop your new image here";
+      overlay.contentEditable = "false";
+      document.body.appendChild(overlay);
+    }
+    overlay.style.left = `${rect.left}px`;
+    overlay.style.top = `${rect.top}px`;
+    overlay.style.width = `${rect.width}px`;
+    overlay.style.height = `${rect.height}px`;
+    overlay.style.borderRadius = getComputedStyle(element).borderRadius || "4px";
+  }
+
+  function getDropOverlayElement(visual) {
+    if (!visual || !visual.element) return null;
+    return visual.element.closest && visual.element.closest(".frame-img") || visual.element;
+  }
+
+  function scheduleDragClear() {
+    clearTimeout(state.dragClearTimer);
+    state.dragClearTimer = window.setTimeout(clearHighlights, 500);
   }
 
   function rectContainsPoint(rect, x, y) {
