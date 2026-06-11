@@ -2,12 +2,15 @@
   const BAR_ID = "__html_presentation_editor_bar";
   const STYLE_ID = "__html_presentation_editor_styles";
   const DROP_OVERLAY_ID = "__html_presentation_editor_drop_overlay";
+  const CROP_HANDLE_CLASS = "__hpe_crop_handle";
+  const CROP_ACTIVE_CLASS = "__hpe_crop_active";
   const CLICK_BLOCK_EVENTS = ["click", "dblclick", "auxclick"];
   const POINTER_BLOCK_EVENTS = ["pointerdown", "mousedown", "touchstart", "pointerup", "mouseup", "touchend"];
   const GESTURE_BLOCK_EVENTS = ["wheel", "touchstart", "touchmove", "touchend"];
   const ACTIVE_CAPTURE_OPTIONS = { capture: true, passive: false };
   const MAX_HISTORY = 60;
   const HISTORY_INPUT_DELAY = 500;
+  const MAX_CROP_SCALE = 4;
   const INTERACTIVE_SELECTOR = [
     "a",
     "button",
@@ -37,7 +40,10 @@
     restoring: false,
     dotRAF: 0,
     highlightedElement: null,
-    dragClearTimer: 0
+    dragClearTimer: 0,
+    cropDrag: null,
+    cropFrame: null,
+    resizeTimer: 0
   };
 
   function enable() {
@@ -54,6 +60,13 @@
     document.addEventListener("drop", onDrop, ACTIVE_CAPTURE_OPTIONS);
     document.addEventListener("dragleave", onDragLeave, ACTIVE_CAPTURE_OPTIONS);
     document.addEventListener("dragend", clearHighlights, ACTIVE_CAPTURE_OPTIONS);
+    document.addEventListener("pointerdown", onCropPointerDown, ACTIVE_CAPTURE_OPTIONS);
+    document.addEventListener("pointermove", onCropPointerMove, ACTIVE_CAPTURE_OPTIONS);
+    document.addEventListener("pointerup", onCropPointerUp, ACTIVE_CAPTURE_OPTIONS);
+    document.addEventListener("pointercancel", onCropPointerUp, ACTIVE_CAPTURE_OPTIONS);
+    document.addEventListener("dragstart", onCropDragStart, ACTIVE_CAPTURE_OPTIONS);
+    window.addEventListener("resize", scheduleCropRefresh);
+    applyAllCrops();
   }
 
   function disable() {
@@ -68,6 +81,14 @@
     document.removeEventListener("drop", onDrop, ACTIVE_CAPTURE_OPTIONS);
     document.removeEventListener("dragleave", onDragLeave, ACTIVE_CAPTURE_OPTIONS);
     document.removeEventListener("dragend", clearHighlights, ACTIVE_CAPTURE_OPTIONS);
+    document.removeEventListener("pointerdown", onCropPointerDown, ACTIVE_CAPTURE_OPTIONS);
+    document.removeEventListener("pointermove", onCropPointerMove, ACTIVE_CAPTURE_OPTIONS);
+    document.removeEventListener("pointerup", onCropPointerUp, ACTIVE_CAPTURE_OPTIONS);
+    document.removeEventListener("pointercancel", onCropPointerUp, ACTIVE_CAPTURE_OPTIONS);
+    document.removeEventListener("dragstart", onCropDragStart, ACTIVE_CAPTURE_OPTIONS);
+    window.removeEventListener("resize", scheduleCropRefresh);
+    clearTimeout(state.resizeTimer);
+    deactivateCropFrame();
     clearHighlights();
     updateBar();
   }
@@ -239,6 +260,39 @@
         text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
         will-change: left, top, width, height;
       }
+      .frame-img.${CROP_ACTIVE_CLASS} {
+        overflow: hidden !important;
+      }
+      .frame-img.${CROP_ACTIVE_CLASS} img[data-hpe-crop="true"] {
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+        will-change: transform, object-position;
+      }
+      body.__hpe_crop_dragging .frame-img.${CROP_ACTIVE_CLASS} img[data-hpe-crop="true"] {
+        cursor: grabbing;
+      }
+      .${CROP_HANDLE_CLASS} {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        z-index: 2147483645;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.96);
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.5);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+        cursor: nwse-resize;
+        pointer-events: auto;
+      }
+      .${CROP_HANDLE_CLASS}::before {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border-right: 2px solid rgba(255, 255, 255, 0.9);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+      }
     `;
     document.head.appendChild(style);
   }
@@ -251,7 +305,7 @@
       bar.contentEditable = "false";
       bar.innerHTML = `
         <div class="__hpe_title">HTML Slides Editor</div>
-        <button type="button" class="__hpe_toggle __hpe_active" data-hpe-action="toggle" data-hpe-tip="Edit text freely. Drag an image onto an existing image to replace it.">
+        <button type="button" class="__hpe_toggle __hpe_active" data-hpe-action="toggle" data-hpe-tip="Edit text freely. Drop an image to replace it, then drag the image or corner handle to crop.">
           <span class="__hpe_state_dot" aria-hidden="true"></span>
           <span data-hpe-toggle-label>Editing</span>
         </button>
@@ -418,6 +472,10 @@
   function createCleanSnapshot() {
     const body = document.body.cloneNode(true);
     body.querySelector(`#${BAR_ID}`)?.remove();
+    body.querySelectorAll(`.${CROP_HANDLE_CLASS}`).forEach((el) => el.remove());
+    body.querySelectorAll(`.${CROP_ACTIVE_CLASS}`).forEach((el) => {
+      el.classList.remove(CROP_ACTIVE_CLASS);
+    });
     body.querySelectorAll("[data-hpe-highlight]").forEach((el) => {
       el.removeAttribute("data-hpe-highlight");
     });
@@ -430,6 +488,7 @@
     state.pendingPreState = null;
     document.body.innerHTML = snapshot;
     showBar();
+    applyAllCrops();
     if (state.active) document.designMode = "on";
     state.restoring = false;
   }
@@ -597,7 +656,6 @@
 
     if (type === "inline-svg") {
       const img = document.createElement("img");
-      img.src = url;
       img.alt = element.getAttribute("aria-label") || "Replaced image";
       img.className = element.getAttribute("class") || "";
       img.style.cssText = element.getAttribute("style") || "";
@@ -605,15 +663,34 @@
       img.style.height = img.style.height || "auto";
       img.style.display = img.style.display || "block";
       element.replaceWith(img);
+      replaceImageSource(img, url);
       return;
     }
 
     if (type === "background") {
       element.style.backgroundImage = `url("${url}")`;
+      element.style.backgroundSize = "cover";
+      element.style.backgroundPosition = "center center";
       return;
     }
 
-    element.src = url;
+    replaceImageSource(element, url);
+  }
+
+  function replaceImageSource(img, url) {
+    let applied = false;
+    const applyAfterLoad = () => {
+      if (applied) return;
+      applied = true;
+      setupCropImage(img, { reset: true });
+      activateCropImage(img);
+    };
+    img.addEventListener("load", applyAfterLoad, { once: true });
+    resetCropData(img);
+    img.dataset.hpeCrop = "true";
+    img.draggable = false;
+    img.src = url;
+    if (img.complete && img.naturalWidth) requestAnimationFrame(applyAfterLoad);
   }
 
   function clearHighlights() {
@@ -667,6 +744,199 @@
   function scheduleDragClear() {
     clearTimeout(state.dragClearTimer);
     state.dragClearTimer = window.setTimeout(clearHighlights, 500);
+  }
+
+  function onCropPointerDown(event) {
+    if (!state.active || isBarElement(event.target)) return;
+    const target = event.target;
+    const handle = target.closest && target.closest(`.${CROP_HANDLE_CLASS}`);
+    const img = handle ? getCropImageForFrame(handle.closest(".frame-img")) : target.closest && target.closest('img[data-hpe-crop="true"]');
+    if (!img) {
+      if (state.cropFrame && !(target.closest && target.closest(`.${CROP_ACTIVE_CLASS}`))) deactivateCropFrame();
+      return;
+    }
+    const frame = getCropFrame(img);
+    if (!frame) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    setupCropImage(img);
+    activateCropFrame(frame, img);
+    state.cropDrag = {
+      mode: handle ? "scale" : "pan",
+      img,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startScale: readCropNumber(img, "hpeCropScale", 1),
+      startPositionX: readCropNumber(img, "hpeCropPositionX", 50),
+      startPositionY: readCropNumber(img, "hpeCropPositionY", 50),
+      startTranslateX: readCropNumber(img, "hpeCropTranslateX", 0),
+      startTranslateY: readCropNumber(img, "hpeCropTranslateY", 0),
+      cover: getCoverExcess(img, frame),
+      historyRecorded: false
+    };
+    document.body.classList.add("__hpe_crop_dragging");
+  }
+
+  function onCropPointerMove(event) {
+    const drag = state.cropDrag;
+    if (!drag) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const { img } = drag;
+    const frame = getCropFrame(img);
+    if (!frame) return;
+    const dx = event.clientX - drag.startClientX;
+    const dy = event.clientY - drag.startClientY;
+    if (!drag.historyRecorded && (Math.abs(dx) > 1 || Math.abs(dy) > 1)) {
+      recordHistoryBoundary();
+      drag.historyRecorded = true;
+    }
+    if (drag.mode === "scale") {
+      const nextScale = drag.startScale + (dx + dy) / 180;
+      img.dataset.hpeCropScale = String(clampNumber(nextScale, 1, MAX_CROP_SCALE));
+    } else {
+      if (drag.cover.excessX > 1) {
+        img.dataset.hpeCropPositionX = String(clampNumber(drag.startPositionX - dx / drag.cover.excessX * 100, 0, 100));
+      }
+      if (drag.cover.excessY > 1) {
+        img.dataset.hpeCropPositionY = String(clampNumber(drag.startPositionY - dy / drag.cover.excessY * 100, 0, 100));
+      }
+      img.dataset.hpeCropTranslateX = String(drag.startTranslateX + dx);
+      img.dataset.hpeCropTranslateY = String(drag.startTranslateY + dy);
+    }
+    applyCrop(img);
+  }
+
+  function onCropPointerUp(event) {
+    if (!state.cropDrag) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    applyCrop(state.cropDrag.img);
+    state.cropDrag = null;
+    document.body.classList.remove("__hpe_crop_dragging");
+  }
+
+  function onCropDragStart(event) {
+    if (event.target && event.target.closest && event.target.closest('img[data-hpe-crop="true"]')) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  }
+
+  function resetCropData(img) {
+    img.dataset.hpeCropScale = "1";
+    img.dataset.hpeCropPositionX = "50";
+    img.dataset.hpeCropPositionY = "50";
+    img.dataset.hpeCropTranslateX = "0";
+    img.dataset.hpeCropTranslateY = "0";
+  }
+
+  function setupCropImage(img, options = {}) {
+    const frame = getCropFrame(img);
+    if (!frame) return;
+    if (options.reset) resetCropData(img);
+    img.dataset.hpeCrop = "true";
+    img.draggable = false;
+    frame.style.overflow = "hidden";
+    if (getComputedStyle(frame).position === "static") frame.style.position = "relative";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.maxWidth = "none";
+    img.style.objectFit = "cover";
+    img.style.display = img.style.display || "block";
+    applyCrop(img);
+  }
+
+  function applyAllCrops() {
+    document.querySelectorAll('img[data-hpe-crop="true"]').forEach((img) => {
+      setupCropImage(img);
+    });
+  }
+
+  function applyCrop(img) {
+    const frame = getCropFrame(img);
+    if (!frame) return;
+    const rect = frame.getBoundingClientRect();
+    const scale = clampNumber(readCropNumber(img, "hpeCropScale", 1), 1, MAX_CROP_SCALE);
+    const positionX = clampNumber(readCropNumber(img, "hpeCropPositionX", 50), 0, 100);
+    const positionY = clampNumber(readCropNumber(img, "hpeCropPositionY", 50), 0, 100);
+    const maxTranslateX = Math.max(0, (scale - 1) * rect.width / 2);
+    const maxTranslateY = Math.max(0, (scale - 1) * rect.height / 2);
+    const translateX = clampNumber(readCropNumber(img, "hpeCropTranslateX", 0), -maxTranslateX, maxTranslateX);
+    const translateY = clampNumber(readCropNumber(img, "hpeCropTranslateY", 0), -maxTranslateY, maxTranslateY);
+    img.dataset.hpeCropScale = String(scale);
+    img.dataset.hpeCropPositionX = String(positionX);
+    img.dataset.hpeCropPositionY = String(positionY);
+    img.dataset.hpeCropTranslateX = String(translateX);
+    img.dataset.hpeCropTranslateY = String(translateY);
+    img.style.objectPosition = `${positionX}% ${positionY}%`;
+    img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    img.style.transformOrigin = "center center";
+  }
+
+  function activateCropImage(img) {
+    const frame = getCropFrame(img);
+    if (frame) activateCropFrame(frame, img);
+  }
+
+  function activateCropFrame(frame, img) {
+    if (state.cropFrame && state.cropFrame !== frame) deactivateCropFrame();
+    state.cropFrame = frame;
+    frame.classList.add(CROP_ACTIVE_CLASS);
+    let handle = frame.querySelector(`.${CROP_HANDLE_CLASS}`);
+    if (!handle) {
+      handle = document.createElement("div");
+      handle.className = CROP_HANDLE_CLASS;
+      handle.contentEditable = "false";
+      handle.title = "Drag to resize crop";
+      frame.appendChild(handle);
+    }
+    if (img) setupCropImage(img);
+  }
+
+  function deactivateCropFrame() {
+    if (state.cropFrame) {
+      state.cropFrame.classList.remove(CROP_ACTIVE_CLASS);
+      state.cropFrame.querySelectorAll(`.${CROP_HANDLE_CLASS}`).forEach((el) => el.remove());
+    }
+    state.cropFrame = null;
+    state.cropDrag = null;
+    document.body.classList.remove("__hpe_crop_dragging");
+  }
+
+  function getCropFrame(img) {
+    return img && img.closest && img.closest(".frame-img");
+  }
+
+  function getCropImageForFrame(frame) {
+    return frame && frame.querySelector('img[data-hpe-crop="true"]');
+  }
+
+  function getCoverExcess(img, frame) {
+    const rect = frame.getBoundingClientRect();
+    if (!rect.width || !rect.height || !img.naturalWidth || !img.naturalHeight) {
+      return { excessX: 0, excessY: 0 };
+    }
+    const frameRatio = rect.width / rect.height;
+    const imageRatio = img.naturalWidth / img.naturalHeight;
+    if (imageRatio > frameRatio) {
+      return { excessX: rect.height * imageRatio - rect.width, excessY: 0 };
+    }
+    return { excessX: 0, excessY: rect.width / imageRatio - rect.height };
+  }
+
+  function scheduleCropRefresh() {
+    clearTimeout(state.resizeTimer);
+    state.resizeTimer = window.setTimeout(applyAllCrops, 80);
+  }
+
+  function readCropNumber(img, key, fallback) {
+    const value = Number.parseFloat(img.dataset[key]);
+    return Number.isFinite(value) ? value : fallback;
+  }
+
+  function clampNumber(value, min, max) {
+    return Math.min(max, Math.max(min, value));
   }
 
   function rectContainsPoint(rect, x, y) {

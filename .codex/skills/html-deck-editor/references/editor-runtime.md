@@ -9,6 +9,7 @@ The runtime in `assets/html-slides-editor-runtime.js` is meant to be added to ge
 - Banner says `Editing`.
 - User clicks text directly and types.
 - User drags an image file onto an existing image/visual to replace it.
+- Dropped images keep the original frame size, fill it with `cover`, and can be cropped by dragging the image or its corner resize handle.
 - User can undo, redo, and stop editing from the banner.
 
 ## Integration Options
