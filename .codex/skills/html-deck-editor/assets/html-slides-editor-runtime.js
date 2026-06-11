@@ -310,7 +310,7 @@
       bar.contentEditable = "false";
       bar.innerHTML = `
         <div class="__hpe_title">HTML Slides Editor</div>
-        <button type="button" class="__hpe_toggle __hpe_active" data-hpe-action="toggle" data-hpe-tip="Drag and drop an image to replace it.">
+        <button type="button" class="__hpe_toggle __hpe_active" data-hpe-action="toggle" data-hpe-tip="Edit text freely. Drag and drop to replace an image.">
           <span class="__hpe_state_dot" aria-hidden="true"></span>
           <span data-hpe-toggle-label>Editing</span>
         </button>
