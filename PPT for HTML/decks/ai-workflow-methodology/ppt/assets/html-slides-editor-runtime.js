@@ -4,6 +4,7 @@
   const DROP_OVERLAY_ID = "__html_presentation_editor_drop_overlay";
   const CROP_HANDLE_CLASS = "__hpe_crop_handle";
   const CROP_ACTIVE_CLASS = "__hpe_crop_active";
+  const CROP_FRAME_CLASS = "__hpe_crop_frame";
   const CROP_HANDLE_ICON = `<svg t="1781145929185" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5179" width="200" height="200"><path d="M793.002667 853.333333l-97.834667-97.834666a42.666667 42.666667 0 0 1 60.330667-60.330667L853.333333 793.002667V725.333333a42.666667 42.666667 0 0 1 85.333334 0v213.333334h-213.333334a42.666667 42.666667 0 0 1 0-85.333334h67.669334z m0-682.666666H725.333333a42.666667 42.666667 0 0 1 0-85.333334h213.333334v213.333334a42.666667 42.666667 0 0 1-85.333334 0V230.997333l-97.834666 97.834667a42.666667 42.666667 0 0 1-60.330667-60.330667L793.002667 170.666667zM170.666667 230.997333V298.666667a42.666667 42.666667 0 1 1-85.333334 0V85.333333h213.333334a42.666667 42.666667 0 1 1 0 85.333334H230.997333l97.834667 97.834666a42.666667 42.666667 0 0 1-60.330667 60.330667L170.666667 230.997333zM230.997333 853.333333H298.666667a42.666667 42.666667 0 0 1 0 85.333334H85.333333v-213.333334a42.666667 42.666667 0 0 1 85.333334 0v67.669334l97.834666-97.834667a42.666667 42.666667 0 1 1 60.330667 60.330667L230.997333 853.333333z" fill="currentColor" p-id="5180"></path></svg>`;
   const CLICK_BLOCK_EVENTS = ["click", "dblclick", "auxclick"];
   const POINTER_BLOCK_EVENTS = ["pointerdown", "mousedown", "touchstart", "pointerup", "mouseup", "touchend"];
@@ -262,16 +263,20 @@
         text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
         will-change: left, top, width, height;
       }
-      .frame-img.${CROP_ACTIVE_CLASS} {
+      .${CROP_ACTIVE_CLASS} {
         overflow: hidden !important;
       }
-      .frame-img.${CROP_ACTIVE_CLASS} img[data-hpe-crop="true"] {
+      img[data-hpe-crop="true"] {
+        -webkit-user-select: none;
+        user-select: none;
+        caret-color: transparent;
+      }
+      .${CROP_ACTIVE_CLASS} img[data-hpe-crop="true"] {
         cursor: grab;
         touch-action: none;
-        user-select: none;
         will-change: transform, object-position;
       }
-      body.__hpe_crop_dragging .frame-img.${CROP_ACTIVE_CLASS} img[data-hpe-crop="true"] {
+      body.__hpe_crop_dragging .${CROP_ACTIVE_CLASS} img[data-hpe-crop="true"] {
         cursor: grabbing;
       }
       .${CROP_HANDLE_CLASS} {
@@ -393,6 +398,7 @@
     document.addEventListener("beforeinput", onBeforeInput, true);
     document.addEventListener("keydown", onHistoryKeyDown, true);
     document.addEventListener("keydown", blockDeckShortcuts, true);
+    document.addEventListener("keydown", blockProtectedVisualEditing, true);
   }
 
   function removeHistoryListeners() {
@@ -400,11 +406,17 @@
     document.removeEventListener("beforeinput", onBeforeInput, true);
     document.removeEventListener("keydown", onHistoryKeyDown, true);
     document.removeEventListener("keydown", blockDeckShortcuts, true);
+    document.removeEventListener("keydown", blockProtectedVisualEditing, true);
     clearTimeout(state.commitTimer);
   }
 
   function onBeforeInput(event) {
     if (!state.active || state.restoring || isBarElement(event.target)) return;
+    if (event.inputType && event.inputType.startsWith("delete") && touchesProtectedVisual(event.target)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     if (state.pendingPreState === null) state.pendingPreState = createCleanSnapshot();
     clearTimeout(state.commitTimer);
     state.commitTimer = setTimeout(commitPendingInput, HISTORY_INPUT_DELAY);
@@ -429,6 +441,38 @@
     const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Escape"];
     if (!keys.includes(event.key)) return;
     event.stopImmediatePropagation();
+  }
+
+  function blockProtectedVisualEditing(event) {
+    if (!state.active || isBarElement(event.target)) return;
+    if (event.key !== "Backspace" && event.key !== "Delete") return;
+    if (!touchesProtectedVisual(event.target)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+
+  function touchesProtectedVisual(target) {
+    if (isProtectedVisualNode(target)) return true;
+    const selection = window.getSelection && window.getSelection();
+    if (!selection || !selection.rangeCount) return false;
+    for (let i = 0; i < selection.rangeCount; i += 1) {
+      const range = selection.getRangeAt(i);
+      if (isProtectedVisualNode(range.commonAncestorContainer)) return true;
+    const protectedNodes = document.querySelectorAll(VISUAL_SELECTOR);
+      for (const node of protectedNodes) {
+        try {
+          if (range.intersectsNode(node)) return true;
+        } catch (_error) {
+          // Ignore detached nodes from transient browser selections.
+        }
+      }
+    }
+    return false;
+  }
+
+  function isProtectedVisualNode(node) {
+    const el = node && (node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement);
+    return !!(el && el.closest && el.closest(`${VISUAL_SELECTOR}, .${CROP_HANDLE_CLASS}`));
   }
 
   function commitPendingInput() {
@@ -694,6 +738,7 @@
   }
 
   function replaceImageSource(img, url) {
+    ensureCropFrame(img, { freeze: true });
     let applied = false;
     const applyAfterLoad = () => {
       if (applied) return;
@@ -766,8 +811,12 @@
     if (!state.active || isBarElement(event.target)) return;
     const target = event.target;
     const handle = target.closest && target.closest(`.${CROP_HANDLE_CLASS}`);
-    const img = handle ? getCropImageForFrame(handle.closest(".frame-img")) : target.closest && target.closest('img[data-hpe-crop="true"]');
+    const img = handle ? getCropImageForFrame(handle.closest(`.${CROP_FRAME_CLASS}, .frame-img`)) : target.closest && target.closest('img[data-hpe-crop="true"]');
     if (!img) {
+      if (target.closest && target.closest(VISUAL_SELECTOR)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
       if (state.cropFrame && !(target.closest && target.closest(`.${CROP_ACTIVE_CLASS}`))) deactivateCropFrame();
       return;
     }
@@ -848,11 +897,13 @@
   }
 
   function setupCropImage(img, options = {}) {
-    const frame = getCropFrame(img);
+    const frame = ensureCropFrame(img);
     if (!frame) return;
     if (options.reset) resetCropData(img);
     img.dataset.hpeCrop = "true";
     img.draggable = false;
+    img.contentEditable = "false";
+    img.setAttribute("contenteditable", "false");
     frame.style.overflow = "hidden";
     if (getComputedStyle(frame).position === "static") frame.style.position = "relative";
     img.style.width = "100%";
@@ -860,6 +911,7 @@
     img.style.maxWidth = "none";
     img.style.objectFit = "cover";
     img.style.display = img.style.display || "block";
+    img.style.verticalAlign = "top";
     applyCrop(img);
   }
 
@@ -922,7 +974,34 @@
   }
 
   function getCropFrame(img) {
-    return img && img.closest && img.closest(".frame-img");
+    if (!img || !img.closest) return null;
+    return img.closest(`.${CROP_FRAME_CLASS}, .frame-img`);
+  }
+
+  function ensureCropFrame(img, options = {}) {
+    if (!img) return null;
+    let frame = getCropFrame(img);
+    if (!frame) {
+      const parent = img.parentElement && img.parentElement.tagName && img.parentElement.tagName.toLowerCase() === "picture"
+        ? img.parentElement.parentElement
+        : img.parentElement;
+      if (!parent || parent === document.body || parent === document.documentElement || isBarElement(parent)) return null;
+      frame = parent;
+      frame.classList.add(CROP_FRAME_CLASS);
+    }
+    if (options.freeze) freezeFrameToCurrentRect(frame);
+    return frame;
+  }
+
+  function freezeFrameToCurrentRect(frame) {
+    if (!frame || frame.classList.contains("frame-img")) return;
+    const rect = frame.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    frame.style.width = `${Math.round(rect.width)}px`;
+    frame.style.height = `${Math.round(rect.height)}px`;
+    frame.style.maxWidth = "100%";
+    if (getComputedStyle(frame).display === "inline") frame.style.display = "inline-block";
+    if (getComputedStyle(frame).position === "static") frame.style.position = "relative";
   }
 
   function getCropImageForFrame(frame) {

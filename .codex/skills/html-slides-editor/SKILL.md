@@ -9,6 +9,8 @@ metadata:
 
 Use this skill when the user wants AI-generated HTML slides to be manually editable **inside the HTML preview itself**. Do not build a Chrome extension and do not frame the work as an HTML checker. The deliverable is an HTML slides/page that includes an embedded editor runtime.
 
+Before modifying the runtime, switch script, autosave behavior, or public packaging, read `references/spec.md`. Treat it as the source of truth and verify against its regression checklist before reporting the work done.
+
 ## What To Build
 
 When this skill is invoked, add a built-in editing layer to the target HTML:
@@ -55,7 +57,7 @@ The switch is safe to run repeatedly: enabling twice will not insert duplicate s
 
 ## Runtime Behavior
 
-The embedded runtime should:
+The embedded runtime must follow `references/spec.md`. Core behavior:
 
 - Set `document.designMode = "on"` during editing so ordinary rendered text can be edited directly.
 - Keep the editor banner itself `contentEditable="false"`.
@@ -70,6 +72,9 @@ The embedded runtime should:
   - inline `<svg>`,
   - SVG `<image>`,
   - elements with CSS `background-image`.
+- Keep replacement images inside the original displayed image area; cover-fill and clip overflow.
+- Show the crop/resize handle at the bottom-right after image replacement.
+- Protect images from text-caret placement and accidental Backspace/Delete removal while editing.
 
 ## Persistence
 
@@ -112,7 +117,7 @@ For HTML slides with slide navigation, animation, or WebGL/canvas backgrounds:
 
 ## Quality Bar
 
-Before finishing, verify:
+Before finishing, verify the regression checklist in `references/spec.md`, including:
 
 - Banner appears at the top of the HTML preview.
 - `Editing` state is visible when active.
@@ -120,6 +125,8 @@ Before finishing, verify:
 - Undo/redo work for typed text.
 - Dragging an image over an existing visual highlights the target.
 - Dropping the image replaces the intended visual.
+- Dropped images keep the old visual frame, cover-fill it, and show the crop handle.
+- Images cannot be removed accidentally with Backspace/Delete in editing mode.
 - Normal slides interaction (pagination, keyboard nav) returns after editing stops.
 - If auto-save is enabled: editing triggers a save after ~1.8 s, "Saved" appears in the bar and fades out, and the change survives a page reload.
 
