@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>HTML Edit Test</title>
+<style>
+  body { font: 16px -apple-system, sans-serif; max-width: 720px; margin: 80px auto; padding: 24px; line-height: 1.6; }
+  h1 { color: #1a73e8; }
+  .img-wrap { background: #f0f0f0; padding: 20px; border-radius: 8px; margin: 24px 0; }
+  img { width: 200px; height: 120px; object-fit: cover; }
+</style>
+</head>
+<body>
+<h1>测试段落标题</h1>
+<p id="p1">第一段文字内容，用来测试编辑撤回功能。</p>
+<p id="p2">第二段文字。</p>
+<div class="img-wrap">
+  <img src="https://via.placeholder.com/200x120/4285f4/ffffff?text=Sample" alt="sample">
+</div>
+<a href="https://example.com">这个链接在编辑模式下不应跳转</a>
+<script>
+  window.chrome = window.chrome || { runtime: { onMessage: { addListener: ()=>{} }, sendMessage: ()=>{} } };
+</script>
+<script src="content.js"></script>
+</body>
+</html>

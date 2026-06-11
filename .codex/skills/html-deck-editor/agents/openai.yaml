@@ -1,0 +1,6 @@
+interface:
+  display_name: "HTML Slides Editor"
+  short_description: "Add an editing bar to HTML slides"
+  default_prompt: "Use $html-slides-editor to embed a top editing banner into these HTML slides so users can edit text directly, undo/redo, pause editing, and drag images to replace existing visuals."
+policy:
+  allow_implicit_invocation: true
