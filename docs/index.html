@@ -153,8 +153,7 @@
 
     .step,
     .feature,
-    .command,
-    .store-item {
+    .command {
       border: 1px solid var(--line);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.62);
@@ -175,8 +174,7 @@
     }
 
     .step strong,
-    .feature strong,
-    .store-item strong {
+    .feature strong {
       display: block;
       margin-top: 18px;
       font-size: 20px;
@@ -184,8 +182,7 @@
     }
 
     .step p,
-    .feature p,
-    .store-item p {
+    .feature p {
       margin: 12px 0 0;
       color: var(--muted);
     }
@@ -287,16 +284,6 @@
       font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     }
 
-    .store-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .store-item {
-      padding: 22px;
-    }
-
     .footer {
       padding: 34px 24px 44px;
       color: rgba(21, 21, 21, 0.58);
@@ -318,8 +305,7 @@
 
       .workflow,
       .preview,
-      .features,
-      .store-grid {
+      .features {
         grid-template-columns: 1fr;
       }
 
@@ -469,28 +455,6 @@ Entry: .codex/skills/html-slides-editor/SKILL.md</code></pre>
       </div>
     </section>
 
-    <section class="section">
-      <div class="wrap">
-        <div class="section-title">
-          <h2>Ready for skill stores.</h2>
-          <p>Different stores use different submission flows. The same repo can support them when the public page clearly explains scope, install path, permissions, and examples.</p>
-        </div>
-        <div class="store-grid">
-          <div class="store-item">
-            <strong>Clear scope</strong>
-            <p>This is an embedded editor for HTML slide decks, not a Chrome extension and not an HTML checker.</p>
-          </div>
-          <div class="store-item">
-            <strong>Predictable permissions</strong>
-            <p>It edits local HTML files only through the generated local save server.</p>
-          </div>
-          <div class="store-item">
-            <strong>Portable package</strong>
-            <p>Instructions, scripts, runtime assets, examples, and metadata are all kept in the repository.</p>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer class="footer">
