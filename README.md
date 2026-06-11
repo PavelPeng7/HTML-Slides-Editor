@@ -1,11 +1,5 @@
 # HTML Slides Editor
 
-HTML Slides Editor is a Codex skill for making AI-generated HTML slide decks editable directly inside their browser preview.
-
-It adds a small editor bar to an existing `index.html`, lets users edit rendered text like a document, drag and drop images to replace existing visuals, undo and redo changes, and persist edits back to disk through a local save server.
-
-## Why This Skill Exists
-
 AI agents are good at generating HTML slides, but tiny presentation edits should not require another prompt. This skill gives users a direct manipulation layer for the last mile: fix a word, replace a picture, adjust an image crop, and keep the result in the source HTML.
 
 ## Features
