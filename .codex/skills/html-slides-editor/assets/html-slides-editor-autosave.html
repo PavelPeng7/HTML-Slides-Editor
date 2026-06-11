@@ -28,6 +28,21 @@
     });
   }
 
+  function hasScriptPattern(root, pattern) {
+    return Array.prototype.some.call(root.querySelectorAll("script"), function (script) {
+      return pattern.test(script.textContent || "");
+    });
+  }
+
+  function cleanGeneratedSlideControls(root) {
+    if (hasScriptPattern(root, /nav\.appendChild\([^)]*\)/) && hasScriptPattern(root, /className\s*=\s*['"]dot['"]/)) {
+      removeAll(root, "#nav .dot[data-i]");
+    }
+    if (hasScriptPattern(root, /document\.body\.appendChild\(ov\)/) && hasScriptPattern(root, /ov\.id\s*=\s*['"]overview['"]/)) {
+      removeAll(root, "#overview");
+    }
+  }
+
   function getCleanHtml() {
     var root = document.documentElement.cloneNode(true);
     removeAll(root, "#__html_presentation_editor_bar");
@@ -36,6 +51,7 @@
     removeAll(root, "#__html_presentation_editor_interaction_hint");
     removeAll(root, ".__hpe_crop_handle");
     removeAll(root, ".__autosave_label");
+    cleanGeneratedSlideControls(root);
     Array.prototype.forEach.call(root.querySelectorAll("[data-hpe-highlight]"), function (el) {
       el.removeAttribute("data-hpe-highlight");
     });

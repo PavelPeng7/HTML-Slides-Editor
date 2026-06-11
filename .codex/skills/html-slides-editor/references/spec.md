@@ -197,6 +197,7 @@ The old visual's displayed area is the frame. The frame size must not change jus
 - autosave status label;
 - pause-to-interact hint;
 - drag highlight attributes;
+- common script-generated slide controls when the deck rebuilds them on load, such as generated `#nav .dot[data-i]` buttons and generated `#overview` panels;
 - transient active/crop body classes.
 
 **Acceptance:**
