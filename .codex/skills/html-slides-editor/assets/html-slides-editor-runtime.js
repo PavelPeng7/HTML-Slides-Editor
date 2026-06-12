@@ -139,10 +139,10 @@
         z-index: 0;
         pointer-events: none;
         background: linear-gradient(90deg,
-          #00c853 0%,
-          #00bcd4 30%,
-          #2979ff 62%,
-          #ff4fd8 100%
+          #20ba6f 0%,
+          #1fc6db 30%,
+          #4d8af0 62%,
+          #f54988 100%
         );
         -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0) 100%);
         mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0) 100%);
