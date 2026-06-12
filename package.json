@@ -10,6 +10,7 @@
   "files": [
     "bin/",
     ".codex/skills/html-slides-editor/",
+    "AGENTS.md",
     "README.md",
     "LICENSE"
   ],
