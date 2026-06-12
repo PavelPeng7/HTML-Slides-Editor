@@ -27,7 +27,7 @@ The skill entry point is:
 
 ## Install
 
-Use the npm CLI from any agent or terminal:
+Use the npm CLI from any agent or terminal after publishing the package to npm:
 
 ```bash
 npx html-slides-editor enable --autosave --serve path/to/index.html
@@ -59,7 +59,7 @@ Then ask Codex:
 Use HTML Slides Editor on this HTML slide deck.
 ```
 
-For a local checkout, the core command is:
+For a local checkout before publishing, the core command is:
 
 ```bash
 node bin/html-slides-editor.js enable --autosave --serve path/to/index.html
