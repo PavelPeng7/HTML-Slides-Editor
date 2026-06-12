@@ -1,6 +1,6 @@
 {
   "name": "html-slides-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Embed a direct editing layer into AI-generated HTML slide decks.",
   "license": "MIT",
   "type": "commonjs",
