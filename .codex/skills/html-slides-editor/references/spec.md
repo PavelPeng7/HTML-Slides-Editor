@@ -75,7 +75,8 @@ The skill must not be an HTML checker. It must not require a Chrome extension. I
 
 - While active, users can click visible text and type directly in the preview.
 - Text editing should feel like editing a document.
-- Common slide navigation shortcuts and gestures are blocked while editing, so editing text does not accidentally switch slides.
+- Common slide keyboard shortcuts are blocked while editing, so editing text does not accidentally switch slides.
+- Wheel and touch swipe gestures remain available in both Editing and Paused states.
 - Pausing editing restores normal deck interactions.
 - Pausing editing should actively restore common generated slide controls such as `#nav .dot[data-i]` when possible.
 - While editing is active, blocked link, button, or scripted interactive clicks should stay quiet. Guidance lives on the center status control instead of a separate popup.
@@ -86,6 +87,7 @@ The skill must not be an HTML checker. It must not require a Chrome extension. I
 - Undo restores prior text.
 - Redo reapplies text.
 - Arrow/page/space navigation does not change slides while editing is active.
+- Wheel and touch swipe gestures can still change slides while editing is active.
 - Normal slide controls work again after editing is paused.
 - Bottom slide dots work again after editing is paused.
 - When paused, hovering the center status control shows `Editing is paused. You can interact with elements normally.`

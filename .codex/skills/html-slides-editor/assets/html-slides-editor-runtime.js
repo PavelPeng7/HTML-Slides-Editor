@@ -7,8 +7,7 @@
   const CROP_FRAME_CLASS = "__hpe_crop_frame";
   const CROP_HANDLE_ICON = `<svg t="1781145929185" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5179" width="200" height="200"><path d="M793.002667 853.333333l-97.834667-97.834666a42.666667 42.666667 0 0 1 60.330667-60.330667L853.333333 793.002667V725.333333a42.666667 42.666667 0 0 1 85.333334 0v213.333334h-213.333334a42.666667 42.666667 0 0 1 0-85.333334h67.669334z m0-682.666666H725.333333a42.666667 42.666667 0 0 1 0-85.333334h213.333334v213.333334a42.666667 42.666667 0 0 1-85.333334 0V230.997333l-97.834666 97.834667a42.666667 42.666667 0 0 1-60.330667-60.330667L793.002667 170.666667zM170.666667 230.997333V298.666667a42.666667 42.666667 0 1 1-85.333334 0V85.333333h213.333334a42.666667 42.666667 0 1 1 0 85.333334H230.997333l97.834667 97.834666a42.666667 42.666667 0 0 1-60.330667 60.330667L170.666667 230.997333zM230.997333 853.333333H298.666667a42.666667 42.666667 0 0 1 0 85.333334H85.333333v-213.333334a42.666667 42.666667 0 0 1 85.333334 0v67.669334l97.834666-97.834667a42.666667 42.666667 0 1 1 60.330667 60.330667L230.997333 853.333333z" fill="currentColor" p-id="5180"></path></svg>`;
   const CLICK_BLOCK_EVENTS = ["click", "dblclick", "auxclick"];
-  const POINTER_BLOCK_EVENTS = ["pointerdown", "mousedown", "touchstart", "pointerup", "mouseup", "touchend"];
-  const GESTURE_BLOCK_EVENTS = ["wheel", "touchstart", "touchmove", "touchend"];
+  const POINTER_BLOCK_EVENTS = ["pointerdown", "mousedown", "pointerup", "mouseup"];
   const ACTIVE_CAPTURE_OPTIONS = { capture: true, passive: false };
   const MAX_HISTORY = 60;
   const HISTORY_INPUT_DELAY = 500;
@@ -556,10 +555,6 @@
       window.addEventListener(type, stopInteractiveHandlers, true);
       document.addEventListener(type, stopInteractiveHandlers, true);
     });
-    GESTURE_BLOCK_EVENTS.forEach((type) => {
-      window.addEventListener(type, blockDeckGesture, ACTIVE_CAPTURE_OPTIONS);
-      document.addEventListener(type, blockDeckGesture, ACTIVE_CAPTURE_OPTIONS);
-    });
     document.addEventListener("submit", blockPageAction, true);
   }
 
@@ -571,10 +566,6 @@
     POINTER_BLOCK_EVENTS.forEach((type) => {
       window.removeEventListener(type, stopInteractiveHandlers, true);
       document.removeEventListener(type, stopInteractiveHandlers, true);
-    });
-    GESTURE_BLOCK_EVENTS.forEach((type) => {
-      window.removeEventListener(type, blockDeckGesture, ACTIVE_CAPTURE_OPTIONS);
-      document.removeEventListener(type, blockDeckGesture, ACTIVE_CAPTURE_OPTIONS);
     });
     document.removeEventListener("submit", blockPageAction, true);
   }
@@ -588,12 +579,6 @@
   function stopInteractiveHandlers(event) {
     if (!state.active || isBarElement(event.target)) return;
     if (!event.target.closest || !event.target.closest(INTERACTIVE_SELECTOR)) return;
-    event.stopImmediatePropagation();
-  }
-
-  function blockDeckGesture(event) {
-    if (!state.active || isBarElement(event.target)) return;
-    if (event.cancelable) event.preventDefault();
     event.stopImmediatePropagation();
   }
 
