@@ -216,12 +216,14 @@ The old visual's displayed area is the frame. The frame size must not change jus
 - `SKILL.md` has `name: html-slides-editor`.
 - Runtime assets live in `assets/`.
 - Deterministic scripts live in `scripts/`.
+- The repository exposes an npm CLI named `html-slides-editor` for non-Codex agents.
 - Detailed specs live in `references/`.
 - The repository has an MIT license and a README explaining what the skill does.
 
 **Acceptance:**
 
 - A user can install the repo as a skill source.
+- A user can run `npx html-slides-editor enable --autosave --serve path/to/index.html`.
 - Codex can discover the skill by name and description.
 - The skill instructions are concise; long product details live in this spec.
 
@@ -229,6 +231,8 @@ The old visual's displayed area is the frame. The frame size must not change jus
 
 Before declaring the skill done, verify:
 
+- `npm run check` succeeds.
+- `npm pack --dry-run --cache /private/tmp/html-slides-editor-npm-cache` includes the CLI and `.codex/skills/html-slides-editor`.
 - `python3 .codex/skills/html-slides-editor/scripts/slides_editor_switch.py enable --autosave path/to/index.html` succeeds.
 - The generated page shows the editor banner.
 - Text can be edited directly.

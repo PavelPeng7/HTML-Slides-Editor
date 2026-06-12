@@ -1,0 +1,34 @@
+{
+  "name": "html-slides-editor",
+  "version": "0.1.0",
+  "description": "Embed a direct editing layer into AI-generated HTML slide decks.",
+  "license": "MIT",
+  "type": "commonjs",
+  "bin": {
+    "html-slides-editor": "bin/html-slides-editor.js"
+  },
+  "files": [
+    "bin/",
+    ".codex/skills/html-slides-editor/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "check": "node --check bin/html-slides-editor.js && node --check .codex/skills/html-slides-editor/assets/html-slides-editor-runtime.js && node --check .codex/skills/html-slides-editor/assets/html-slides-editor-server.js"
+  },
+  "keywords": [
+    "html",
+    "slides",
+    "presentation",
+    "editor",
+    "codex",
+    "ai-agent"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@ssh.github.com:443/imvanessali/HTML-Slides-Editor.git"
+  }
+}

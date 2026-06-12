@@ -27,6 +27,26 @@ The skill entry point is:
 
 ## Install
 
+Use the npm CLI from any agent or terminal:
+
+```bash
+npx html-slides-editor enable --autosave --serve path/to/index.html
+```
+
+That command injects the editor, enables saving, and starts a local preview server. Open the printed URL, usually:
+
+```text
+http://127.0.0.1:8765/
+```
+
+Other useful commands:
+
+```bash
+npx html-slides-editor disable path/to/index.html
+npx html-slides-editor status path/to/index.html
+npx html-slides-editor serve path/to/index.html --port 8765
+```
+
 In Codex, install this repository as a skill source:
 
 ```text
@@ -42,8 +62,7 @@ Use HTML Slides Editor on this HTML slide deck.
 For a local checkout, the core command is:
 
 ```bash
-python3 .codex/skills/html-slides-editor/scripts/slides_editor_switch.py enable --autosave path/to/index.html
-node path/to/html-slides-editor-server.js 8765
+node bin/html-slides-editor.js enable --autosave --serve path/to/index.html
 ```
 
 Open the generated local server URL, such as:
@@ -65,6 +84,7 @@ Use this checklist when submitting to a skill store:
 - No Chrome extension dependency
 - Runtime assets are bundled under `assets/`
 - Switch script is bundled under `scripts/`
+- npm CLI is exposed as `html-slides-editor`
 - Store card metadata is present in `agents/openai.yaml`
 - The sample decks demonstrate both a general slide deck and a travel deck
 
