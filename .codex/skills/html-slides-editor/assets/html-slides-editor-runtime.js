@@ -142,7 +142,7 @@
           #00c853 0%,
           #00bcd4 30%,
           #2979ff 62%,
-          #7c4dff 100%
+          #ff4fd8 100%
         );
         -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0) 100%);
         mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0) 100%);
