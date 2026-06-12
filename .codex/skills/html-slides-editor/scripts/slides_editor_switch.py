@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 RUNTIME_NAME = "html-slides-editor-runtime.js"
-RUNTIME_VERSION = "20260612-green-blue-pink"
+RUNTIME_VERSION = "20260612-paused-nav-repair"
 SCRIPT_SRC = f"./assets/{RUNTIME_NAME}?v={RUNTIME_VERSION}"
 SCRIPT_TAG = f'<script src="{SCRIPT_SRC}"></script>'
 AUTOSAVE_NAME = "html-slides-editor-autosave.html"

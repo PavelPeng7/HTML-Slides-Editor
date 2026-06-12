@@ -93,6 +93,7 @@
     deactivateCropFrame();
     clearHighlights();
     updateBar();
+    restoreCommonSlideControls();
   }
 
   function injectStyles() {
@@ -598,6 +599,35 @@
 
   function isBarElement(target) {
     return Boolean(target && target.closest && target.closest(`#${BAR_ID}`));
+  }
+
+  function restoreCommonSlideControls() {
+    const nav = document.getElementById("nav");
+    if (!nav) return;
+    nav.contentEditable = "false";
+    nav.querySelectorAll(".dot[data-i]").forEach((dot) => {
+      dot.contentEditable = "false";
+      dot.onclick = (event) => {
+        const index = Number(dot.dataset.i);
+        if (!Number.isFinite(index)) return;
+        event.preventDefault();
+        if (typeof window.go === "function") {
+          window.go(index);
+        } else {
+          fallbackGoToSlide(index);
+        }
+      };
+    });
+  }
+
+  function fallbackGoToSlide(index) {
+    const deck = document.getElementById("deck");
+    if (!deck) return;
+    deck.style.transform = `translateX(${-index * 100}vw)`;
+    window.__currentSlideIndex = index;
+    document.querySelectorAll("#nav .dot[data-i]").forEach((dot) => {
+      dot.classList.toggle("active", Number(dot.dataset.i) === index);
+    });
   }
 
   function onDragOver(event) {

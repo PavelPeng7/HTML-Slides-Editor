@@ -9,7 +9,7 @@ const ROOT = path.resolve(__dirname, "..");
 const SKILL_DIR = path.join(ROOT, ".codex", "skills", "html-slides-editor");
 const ASSETS_DIR = path.join(SKILL_DIR, "assets");
 const RUNTIME_NAME = "html-slides-editor-runtime.js";
-const RUNTIME_VERSION = "20260612-green-blue-pink";
+const RUNTIME_VERSION = "20260612-paused-nav-repair";
 const RUNTIME_SRC = `./assets/${RUNTIME_NAME}?v=${RUNTIME_VERSION}`;
 const RUNTIME_TAG = `<script src="${RUNTIME_SRC}"></script>`;
 const AUTOSAVE_NAME = "html-slides-editor-autosave.html";
