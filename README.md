@@ -17,20 +17,6 @@ It ships as a Codex skill and as the [`html-slides-editor`](https://www.npmjs.co
 - Pause editing to restore normal slide navigation
 - Auto-save back to `index.html`
 
-## Skill Location
-
-The distributable skill lives at:
-
-```text
-.codex/skills/html-slides-editor/
-```
-
-The skill entry point is:
-
-```text
-.codex/skills/html-slides-editor/SKILL.md
-```
-
 ## Install and use
 
 This skill was built for Codex, but it works with any AI coding agent or a plain terminal. Pick the path that matches your setup.
