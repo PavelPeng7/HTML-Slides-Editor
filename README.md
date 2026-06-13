@@ -6,7 +6,7 @@ It ships as a Codex skill and as the [`html-slides-editor`](https://www.npmjs.co
 
 ![HTML Slides Editor — the editor running on its own landing page](https://raw.githubusercontent.com/imvanessali/HTML-Slides-Editor/main/media/landing.jpg)
 
-> The landing page above is itself editable — see it live at [imvanessa.li/slides](https://imvanessa.li/slides/) (desktop only; mobile editing isn't supported yet).
+> The landing page above is itself editable — see it live at [imvanessa.li/slides](https://imvanessa.li/slides/) (desktop only).
 
 ## Features
 
