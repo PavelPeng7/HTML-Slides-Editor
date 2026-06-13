@@ -63,6 +63,10 @@ npx html-slides-editor serve path/to/index.html --port 8765
 
 **Do not use `file://` when edits need to persist.** Browsers cannot write local files from a direct file preview, so persistent saving requires the local server from `--serve`.
 
+---
+
+⭐ Found this useful? Star the repo to help others find it.
+
 ## License
 
 MIT License. See [LICENSE](LICENSE).
