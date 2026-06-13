@@ -4,6 +4,10 @@ AI agents are good at generating HTML slides, but tiny presentation edits should
 
 It ships as a Codex skill and as the [`html-slides-editor`](https://www.npmjs.com/package/html-slides-editor) npm CLI, so it works inside Codex, in any other AI coding agent, or straight from a terminal.
 
+![HTML Slides Editor — the editor running on its own landing page](https://raw.githubusercontent.com/imvanessali/HTML-Slides-Editor/main/media/landing.jpg)
+
+> The landing page above is itself editable — see it live at [imvanessa.li/slides](https://imvanessa.li/slides/).
+
 ## Features
 
 - Direct text editing in the rendered HTML preview
