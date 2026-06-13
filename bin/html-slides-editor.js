@@ -234,7 +234,11 @@ function serveHtml(htmlPath, port) {
   });
 
   server.on("error", (error) => {
-    console.error(`html-slides-editor: failed to serve on 127.0.0.1:${port}: ${error.message}`);
+    if (error.code === "EADDRINUSE") {
+      console.error(`html-slides-editor: port ${port} is already in use. Re-run with a different port, e.g. --port ${port + 1}.`);
+    } else {
+      console.error(`html-slides-editor: failed to serve on 127.0.0.1:${port}: ${error.message}`);
+    }
     process.exit(1);
   });
 
