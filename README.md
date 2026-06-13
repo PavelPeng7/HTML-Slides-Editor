@@ -1,6 +1,8 @@
 # HTML Slides Editor
 
-AI agents are good at generating HTML slides, but tiny presentation edits should not require another prompt. This skill gives users a direct manipulation layer for the last mile: fix a word, replace a picture, adjust an image crop, and keep the result in the source HTML.
+AI agents are good at generating HTML slides, but tiny presentation edits should not require another prompt. This gives users a direct manipulation layer for the last mile: fix a word, replace a picture, adjust an image crop, and keep the result in the source HTML.
+
+It ships as a Codex skill and as the [`html-slides-editor`](https://www.npmjs.com/package/html-slides-editor) npm CLI, so it works inside Codex, in any other AI coding agent, or straight from a terminal.
 
 ## Features
 
@@ -25,9 +27,29 @@ The skill entry point is:
 .codex/skills/html-slides-editor/SKILL.md
 ```
 
-## Install
+## Install and use
 
-Use the npm CLI from any agent or terminal after publishing the package to npm:
+This skill was built for Codex, but it works with any AI coding agent or a plain terminal. Pick the path that matches your setup.
+
+### If you use Codex
+
+1. Add this repository as a skill source:
+
+   ```text
+   https://github.com/imvanessali/HTML-Slides-Editor
+   ```
+
+2. Then just ask:
+
+   ```text
+   Use HTML Slides Editor on this HTML slide deck.
+   ```
+
+Codex runs the CLI for you, enables autosave, starts the local preview server, and hands you the URL. You don't need to remember any commands.
+
+### If you use another agent or a terminal
+
+Works with Claude Code, Cursor, Windsurf, or a plain terminal — anywhere you can run `npx`. The package is published on npm as [`html-slides-editor`](https://www.npmjs.com/package/html-slides-editor):
 
 ```bash
 npx html-slides-editor enable --autosave --serve path/to/index.html
@@ -47,31 +69,9 @@ npx html-slides-editor status path/to/index.html
 npx html-slides-editor serve path/to/index.html --port 8765
 ```
 
-In Codex, install this repository as a skill source:
+> Working from a local checkout of this repo instead of npm? Replace `npx html-slides-editor` with `node bin/html-slides-editor.js` in any command above.
 
-```text
-https://github.com/imvanessali/HTML-Slides-Editor
-```
-
-Then ask Codex:
-
-```text
-Use HTML Slides Editor on this HTML slide deck.
-```
-
-For a local checkout before publishing, the core command is:
-
-```bash
-node bin/html-slides-editor.js enable --autosave --serve path/to/index.html
-```
-
-Open the generated local server URL, such as:
-
-```text
-http://127.0.0.1:8765/
-```
-
-Do not use `file://` when edits need to persist. Browsers cannot write local files from a direct file preview.
+**Do not use `file://` when edits need to persist.** Browsers cannot write local files from a direct file preview, so persistent saving requires the local server from `--serve`.
 
 ## Distribution Checklist
 

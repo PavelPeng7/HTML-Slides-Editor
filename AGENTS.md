@@ -2,6 +2,8 @@
 
 Use this repository when a user wants to manually edit an AI-generated HTML slide deck in the browser preview.
 
+Built for Codex, but usable by any AI coding agent or a plain terminal. Codex can load the bundled skill (see [Codex Skill](#codex-skill) below); every other agent should drive the `html-slides-editor` npm CLI directly, as shown next.
+
 ## Primary Command
 
 After the npm package is published, prefer:
