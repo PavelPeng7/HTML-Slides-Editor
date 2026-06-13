@@ -66,7 +66,3 @@ npx html-slides-editor serve path/to/index.html --port 8765
 ---
 
 ⭐ Found this useful? Star the repo to help others find it.
-
-## License
-
-MIT License. See [LICENSE](LICENSE).
